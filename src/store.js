@@ -5,7 +5,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
+    manuwidth: 6,
+    mainwidth: 18,
+    jsondata: {},
+    menuWidth: 100,
   },
   mutations: {
 
