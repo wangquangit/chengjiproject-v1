@@ -11,6 +11,7 @@
                 auto-complete="off"
                 placeholder="请输入用户名"
                 autofocus='true'
+                v-model="username"
             >
                 <i slot="prefix"
                 class="icon-yonghu"></i>
@@ -23,6 +24,7 @@
                 size="large" 
                 auto-complete="off" 
                 placeholder="请输入密码"
+                v-model="password"
             >
                 <i class="el-icon-view el-input__icon" slot="suffix"></i>
                 <i slot="prefix" class="icon-mima"></i>
@@ -59,6 +61,7 @@
 </template>
 
 <script>
+    import config from '../config.js'
     export default{
         name: 'cjUserLogin',
         data() {
@@ -71,9 +74,24 @@
         },
         methods: {
             goindex(){
-                this.$router.push('/index')
+                this.$axios.post(
+                    config.serverurl+'/login',
+                    {
+                        code: this.code,
+                        loginname: this.username,
+                        password: this.password
+                    }
+                ).then((res) => {
+                    console.log('登陆请求:',res)
+                    let token = res.data.data['token'] // 获取token
+                    sessionStorage.setItem('token', token) // 设置保存到本地token
+                }).catch((err) => {
+                    console.log('请求失败')
+                    console.log('失败详情:',err)
+                })
+                this.$router.push('/')
             }
-        }
+        },
     }
 </script>
 

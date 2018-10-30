@@ -1,10 +1,5 @@
 <template>
     <avue-crud :data="data" :option="option">
-        <template slot-scope="scope" slot="menuLeft">
-            <el-button v-for="(item, index) in jsondata.index.havebuttonsD" :key="index">
-                {{item.buttonname}}
-            </el-button>
-        </template>
     </avue-crud>
 </template>
 

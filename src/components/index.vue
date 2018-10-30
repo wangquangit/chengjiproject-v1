@@ -5,26 +5,41 @@
                 <el-radio-button :label="false">展开</el-radio-button>
                 <el-radio-button :label="true">收起</el-radio-button>
             </el-radio-group> -->
-
-            <el-menu default-active="1-4-1" class="el-menu-vertical-demo" :collapse="isCollapse">
-                <el-button @click="changewidth()" size="small" :circle=true :icon="manubuttonicon"></el-button>
-                <el-menu-item 
-                    :index="index" 
-                    v-for="(item, index) in this.$store.state.jsondata" 
-                    :key="index"
-                    @click="gotourl(item.manuinfo.url)"
+            <!-- 左侧菜单栏 -->
+            
+            <el-menu 
+                default-active="1-4-1" 
+                class="el-menu-vertical-demo" 
+                :collapse="isCollapse"
+            >
+                <el-submenu 
+                    :index="String(menuindex)"
+                    v-for="(menu, menuindex) in userMenuInfo"
+                    :key="menuindex"
                 >
-                    <i class="el-icon-menu"></i>
-                    <span slot="title">{{item.manuinfo.manuname}}</span>
-                </el-menu-item>
+                    <template slot="title">
+                        <i class="el-icon-location"></i>
+                        <span>{{menu.name}}</span>
+                    </template>
+                    <el-menu-item-group>
+                        <el-menu-item
+                            v-for="(item, itemindex) in menu.children"
+                            :key="itemindex"
+                            :index="String(menuindex+'-'+itemindex)"
+                            @click="gotourl(item.listButton,item.url)"
+                        >
+                            {{item.name}}
+                        </el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
             </el-menu>
         </el-col>
         <el-col :xs="24" :sm="mainwidth">
             <el-container>
-                <el-header>
+                <el-header class="header">
                     <!-- <i class="hidden-sm-and-up el-icon-arrow-down" @click="changewidth()"></i> -->
 
-                    <el-dropdown trigger="click" size="medium" class="hidden-sm-and-up">
+                    <!-- <el-dropdown trigger="click" size="medium" class="hidden-sm-and-up">
                         <span class="el-dropdown-link">
                             <el-button
                                 :circle=true
@@ -42,10 +57,11 @@
                                 </li>
                             </el-dropdown-item>
                         </el-dropdown-menu>
-                    </el-dropdown>
+                    </el-dropdown> -->
+                    头部组件
 
                 </el-header>
-                <el-main>
+                <el-main class="main">
                     <keep-alive>
                         <router-view>
                         </router-view>
@@ -57,8 +73,8 @@
 </template>
 
 <script>
-    import jsondata from './get.js'
     import { mapState } from 'vuex';
+    import config from './config.js'
     export default{
         data() {
             return {
@@ -67,11 +83,10 @@
                 manubuttonicon: 'el-icon-d-arrow-left',
             }
         },
-        mounted() {
-            this.$store.state.jsondata = jsondata.data
-        },
         methods: {
-            gotourl(url) {
+            gotourl(listButtons,url) {
+                this.$store.state.nowButtons = listButtons
+                console.log('listButtons:',this.$store.state.nowButtons)
                 this.$router.push(url)
             },
             changewidth() {
@@ -85,10 +100,27 @@
                     this.$store.state.mainwidth = 18,
                     this.$store.state.manuwidth = 6
                 }
+            },
+            getUserMenuInfo() {
+                this.$axios({
+                    method: 'post',
+                    url: config.serverurl+'/login/getUserPermission',
+                    headers: {
+                        authorization: sessionStorage.getItem('token')
+                    },
+                }).then((res) => {
+                    console.log('菜单栏:',res)
+                    this.$store.state.userMenuInfo = res.data
+                }).catch((err) => {
+                    console.log('请求失败')
+                })
             }
         },
         computed: {
-            ...mapState(['manuwidth','mainwidth'])
+            ...mapState(['manuwidth','mainwidth','userMenuInfo'])
+        },
+        created() {
+            this.getUserMenuInfo()
         }
     }
 </script>
@@ -109,5 +141,11 @@
   .grid-content {
     border-radius: 4px;
     min-height: 36px;
+  }
+  .header{
+      background: #eee
+  }
+  .main{
+      background: #ccc
   }
 </style>
