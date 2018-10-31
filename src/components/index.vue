@@ -75,7 +75,7 @@
         methods: {
             gotourl(listButtons,url) {
                 this.$store.state.nowButtons = listButtons // 将当前组件的按钮添加进全局
-                // console.log('listButtons:',this.$store.state.nowButtons)
+                console.log('listButtons:',this.$store.state.nowButtons)
                 this.$router.push(url)
             },
             changewidth() {

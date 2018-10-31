@@ -14,7 +14,7 @@
                 slot="menuLeft"
             >
                 <!-- 按钮循环 -->
-                <el-button 
+                <!-- <el-button 
                     class="cjbuttin"
                     v-for="(item, index) in nowButtons"
                     :key="index"
@@ -24,10 +24,13 @@
                 >
                     <i :class="item.icon"></i>
                     {{item.buttonname}}
-                </el-button>
+                </el-button> -->
+
+                <!-- 自定义按钮组件 -->
+                <cj-menu-button @transmitform="transmitform"></cj-menu-button>
 
                 <!-- 弹出框 -->
-                <el-dialog title="新增" :visible.sync="dialogFormVisible">
+                <!-- <el-dialog title="新增" :visible.sync="dialogFormVisible">
                     <el-form>
                         <el-form-item label="姓名" :label-width="formLabelWidth">
                             <el-input v-model="form.truename"></el-input>
@@ -43,10 +46,10 @@
                         </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
-                        <el-button @click="cancel()">取 消</el-button>
-                        <el-button type="primary" @click="submitUserInfo()">确 定</el-button>
+                        <el-button @click="cancel">取 消</el-button>
+                        <el-button type="primary" @click="submitUserInfo">确 定</el-button>
                     </div>
-                </el-dialog>
+                </el-dialog> -->
             </template>
         </avue-crud>
     </div>
@@ -55,7 +58,7 @@
 <script>
 import {mapState} from 'vuex'
 import config from '../config.js'
-
+import cjMenuButton from '../shareComponents/cjmenubutton.vue'
 export default {
     data() {
         return {
@@ -88,6 +91,9 @@ export default {
     },
     computed: {
         ...mapState(['nowButtons'])
+    },
+    components: {
+        cjMenuButton
     },
     methods: {
         getuserinfo() {
@@ -138,40 +144,44 @@ export default {
         showInfo() {
             console.log('showInfo方法执行')
         },
-        // 提交添加信息
-        submitUserInfo() {
-            this.$axios({
-                method: 'post',
-                url: config.serverurl+'/user/addInfo',
-                query: {truename: this.form.truename,phone: this.form.phone,password: this.form.password,loginname: this.form.loginname}
-            }).then((res) => {
-                let msg = res.data.msg
-                if(msg === '添加成功'){
-                    this.$message({
-                        // 成功后的提示信息
-                        message: '添加成功',
-                        type: 'success'
-                    });
-                    this.form.truename = ''
-                    this.form.phone = ''
-                    this.form.password = ''
-                    this.dialogFormVisible = false // 添加成功后的提示消息关闭
-                } else {
-                    this.$message({
-                        message: '添加失败'
-                    })
-                }
-            }).catch((err) => {
-                console.log('请求失败')
-            })
+        transmitform(value) {
+            // 接收子组件传递的值
+            console.log('子组件传递过来的值为:',value)
         },
-        // 取消添加
-        cancel() {
-            this.dialogFormVisible = false
-            this.$message({
-                message: '取消添加',
-            })
-        }
+        // 提交添加信息
+        // submitUserInfo() {
+        //     this.$axios({
+        //         method: 'post',
+        //         url: config.serverurl+'/user/addInfo',
+        //         query: {truename: this.form.truename,phone: this.form.phone,password: this.form.password,loginname: this.form.loginname}
+        //     }).then((res) => {
+        //         let msg = res.data.msg
+        //         if(msg === '添加成功'){
+        //             this.$message({
+        //                 // 成功后的提示信息
+        //                 message: '添加成功',
+        //                 type: 'success'
+        //             });
+        //             this.form.truename = ''
+        //             this.form.phone = ''
+        //             this.form.password = ''
+        //             this.dialogFormVisible = false // 添加成功后的提示消息关闭
+        //         } else {
+        //             this.$message({
+        //                 message: '添加失败'
+        //             })
+        //         }
+        //     }).catch((err) => {
+        //         console.log('请求失败')
+        //     })
+        // },
+        // // 取消添加
+        // cancel() {
+        //     this.dialogFormVisible = false
+        //     this.$message({
+        //         message: '取消添加',
+        //     })
+        // }
     }
 }
 </script>
