@@ -9,9 +9,19 @@
             
             <el-menu 
                 default-active="1-4-1" 
-                class="el-menu-vertical-demo" 
+                class="el-menu-vertical-demo leftmenu" 
                 :collapse="isCollapse"
             >
+                <h3 class="logo">
+                    <router-link to="/">
+                        <span>
+                            cjProject -V1.1
+                        </span>
+                    </router-link>
+                </h3>
+                <h3 v-if="loading">
+                    加载中...
+                </h3>
                 <el-submenu 
                     :index="String(menuindex)"
                     v-for="(menu, menuindex) in userMenuInfo"
@@ -34,37 +44,15 @@
                 </el-submenu>
             </el-menu>
         </el-col>
-        <el-col :xs="24" :sm="mainwidth">
+        <el-col :xs="24" :sm="mainwidth" class="indexright">
             <el-container>
                 <el-header class="header">
-                    <!-- <i class="hidden-sm-and-up el-icon-arrow-down" @click="changewidth()"></i> -->
-
-                    <!-- <el-dropdown trigger="click" size="medium" class="hidden-sm-and-up">
-                        <span class="el-dropdown-link">
-                            <el-button
-                                :circle=true
-                                size="medium"
-                                class="el-icon-arrow-down el-icon--right"
-                            ></el-button>
-                        </span>
-                        <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item 
-                                v-for="(item, indexs) in this.$store.state.jsondata" 
-                                :key="indexs"
-                            >  
-                                <li @click="gotourl(item.manuinfo.url)">
-                                    {{item.manuinfo.manuname}}
-                                </li>
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown> -->
                     头部组件
-
                 </el-header>
                 <el-main class="main">
                     <keep-alive>
-                        <router-view>
-                        </router-view>
+                        <!-- transition: 过渡效果 -->
+                        <router-view></router-view>
                     </keep-alive>
                 </el-main>
             </el-container>
@@ -81,12 +69,13 @@
                 msg: 'this is index views',
                 isCollapse: false,
                 manubuttonicon: 'el-icon-d-arrow-left',
+                loading: true, // 左侧菜单栏加载状态
             }
         },
         methods: {
             gotourl(listButtons,url) {
-                this.$store.state.nowButtons = listButtons
-                console.log('listButtons:',this.$store.state.nowButtons)
+                this.$store.state.nowButtons = listButtons // 将当前组件的按钮添加进全局
+                // console.log('listButtons:',this.$store.state.nowButtons)
                 this.$router.push(url)
             },
             changewidth() {
@@ -105,12 +94,10 @@
                 this.$axios({
                     method: 'post',
                     url: config.serverurl+'/login/getUserPermission',
-                    headers: {
-                        authorization: sessionStorage.getItem('token')
-                    },
                 }).then((res) => {
                     console.log('菜单栏:',res)
                     this.$store.state.userMenuInfo = res.data
+                    this.loading = false // 加载状态消失
                 }).catch((err) => {
                     console.log('请求失败')
                 })
@@ -121,7 +108,7 @@
         },
         created() {
             this.getUserMenuInfo()
-        }
+        },
     }
 </script>
 
@@ -147,5 +134,11 @@
   }
   .main{
       background: #ccc
+  }
+  .indexright{
+      float: right;
+  }
+  .logo{
+      margin: 1rem 0;
   }
 </style>

@@ -89,7 +89,7 @@
                     console.log('请求失败')
                     console.log('失败详情:',err)
                 })
-                this.$router.push('/')
+                this.$router.push('/index')
             }
         },
     }

@@ -14,6 +14,8 @@ Vue.config.productionTip = false
 Vue.use(Avue);
 Vue.use(ElementUI);
 
+axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
+
 Vue.prototype.$axios = axios
 
 new Vue({

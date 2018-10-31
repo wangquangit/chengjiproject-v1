@@ -1,3 +1,3 @@
 export default{
-    serverurl: 'http://192.168.0.231:8888'
+    serverurl: 'http://192.168.0.205:8888'
 }
