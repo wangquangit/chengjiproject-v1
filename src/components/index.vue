@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="10">
-        <el-col :xs="0" :sm="manuwidth">
+        <el-col :xs="0" :sm="4">
             <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
                 <el-radio-button :label="false">展开</el-radio-button>
                 <el-radio-button :label="true">收起</el-radio-button>
@@ -44,7 +44,7 @@
                 </el-submenu>
             </el-menu>
         </el-col>
-        <el-col :xs="24" :sm="mainwidth" class="indexright">
+        <el-col :xs="24" :sm="20" class="indexright">
             <el-container>
                 <el-header class="header">
                     头部组件
@@ -94,13 +94,22 @@
                 this.$axios({
                     method: 'post',
                     url: config.serverurl+'/login/getUserPermission',
-                }).then((res) => {
-                    console.log('菜单栏:',res)
-                    this.$store.state.userMenuInfo = res.data
+                }).then((response) => {
+                    this.$store.state.userMenuInfo = response.data
                     this.loading = false // 加载状态消失
-                }).catch((err) => {
-                    console.log('请求失败')
+                    this.setMainButtons(response) // 获取按钮后添加到全局
+                }).catch((error) => {
+                    console.log('index请求失败')
                 })
+            },
+            setMainButtons(response) {
+                // 将按钮对象组织后添加到全局
+                let data = response.data
+                for(var item of data){
+                    for(var btn of item.children){
+                        this.$store.state.mainButtonInfo[btn.url] = btn.listButton
+                    }
+                }
             }
         },
         computed: {

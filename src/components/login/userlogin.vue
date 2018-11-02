@@ -74,6 +74,7 @@
         },
         methods: {
             goindex(){
+                console.log('登陆请求发起!!!')
                 this.$axios.post(
                     config.serverurl+'/login',
                     {

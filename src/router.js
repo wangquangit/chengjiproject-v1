@@ -38,7 +38,7 @@ const router = new Router({
           path: 'user',
           name: 'user',
           component: () => import('./components/main/user.vue')
-        }
+        },
       ]
     },
     {

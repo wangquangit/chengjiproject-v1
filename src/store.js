@@ -11,6 +11,8 @@ export default new Vuex.Store({
     menuWidth: 100,
     userMenuInfo: [],
     nowButtons: [],
+    selectionArr: [],
+    mainButtonInfo: {}
   },
   mutations: {
 
