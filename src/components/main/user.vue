@@ -17,6 +17,9 @@
                 @editInfo="editInfo"
                 @editSubmit="editSubmit"
                 @deleteOk="getInfo"
+                @submitSearch="submitSearch"
+                @showInfo="showInfo"
+                @restore="restore"
             ></cj-main-top-button>
         </template>
     </avue-crud>
@@ -34,6 +37,7 @@ export default {
                     {label: '手机号', prop: 'phone', value: ''},
                     {label: '密码', prop: 'password', value: ''},
                 ],
+                selectionArr: [],
             },
             buttonList: [],
             data: [],
@@ -99,7 +103,6 @@ export default {
         },
         addInfo(value) {
             // 获取子组件传递的表单信息
-            console.log('收到子组件发来的信息:',value[0].value)
             this.$axios({
                 method: 'post',
                 url: config.serverurl+'/user/addInfo',
@@ -109,35 +112,33 @@ export default {
                     password: value[2].value
                 }
             }).then((res) => {
-                console.log(res)
                 this.getInfo()
-                this.userInfo.forms[0].value = ''
-                this.userInfo.forms[1].value = ''
-                this.userInfo.forms[2].value = ''
-            }).catch((err) => {
-                console.log(err)
+                this.emptyForms()
             })
         },
         editInfo() {
             // 更新当前forms表单
-            if(this.$store.state.selectionArr.length == 1){
-                console.log(this.userInfo.forms)
-                console.log(this.$store.state.selectionArr[0])
-                this.userInfo.forms[0].value = this.$store.state.selectionArr[0].loginname
-                this.userInfo.forms[1].value = this.$store.state.selectionArr[0].phone
-                this.userInfo.forms[2].value = this.$store.state.selectionArr[0].password
+            if(this.userInfo.selectionArr.length == 1){
+                this.userInfo.forms[0].value = this.userInfo.selectionArr[0].loginname
+                this.userInfo.forms[1].value = this.userInfo.selectionArr[0].phone
+                this.userInfo.forms[2].value = this.userInfo.selectionArr[0].password
             } else {
                 this.$message({message:'修改时一次只能选择一个'})
             }
         },
+        emptyForms() {
+            // 清空表单value值
+            for(var item of this.userInfo.selectionArr){
+                item.value = ''
+            }
+        },
         editSubmit(value) {
             // 提交修改请求
-            console.log('收到修改请求',value)
             this.$axios({
                 method: 'put',
                 url: config.serverurl+'/user/editInfo',
                 params: {
-                    id: this.$store.state.selectionArr[0].id,
+                    id: this.userInfo.selectionArr[0].id,
                     loginname: value[0].value,
                     phone: value[1].value,
                     password: value[2].value,
@@ -145,13 +146,75 @@ export default {
             }).then((res) => {
                 this.$message({message:'修改成功', type: 'success'})
                 this.getInfo()
+                this.emptyForms()
             }).catch((err) => {
                 alert('修改失败')
             })
         },
+        submitSearch(value) {
+            // 搜索表单提交
+            let searchForm = {
+                where: [
+                    {
+                        name: 'truename|loginname',
+                        op: 'like',
+                        value: value[0].value
+                    },
+                    {
+                        name: 'phone',
+                        op: 'eq',
+                        value: value[1].value
+                    }
+                ]
+            }
+            this.$axios({
+                method: 'post',
+                url: config.serverurl+'/user/search',
+                data: {
+                    where: searchForm.where
+                    // ??? 请求时请求数据长度默认为10 ???
+                }
+            }).then((res) => {
+                this.$message({
+                    message: '共找到'+res.data.total+'条结果!',
+                    type: 'success'
+                })
+                this.data = res.data.records
+                this.page.total = res.data.total
+                this.page.currentPage = res.data.current
+            }).catch((err) => {
+                alert(err)
+            })
+        },
+        showInfo() {
+            let arr = this.userInfo.selectionArr
+            if(arr.length == 1){
+                this.userInfo.forms = [
+                    {label: '公司ID', prop: 'companyid', value: arr[0].companyid},
+                    {label: '创建时间', prop: 'createtime', value: arr[0].createtime},
+                    {label: '部门ID', prop: 'departmentid', value: arr[0].departmentid},
+                    {label: '登陆名', prop: 'loginname', value: arr[0].loginname},
+                    {label: '最后修改时间', prop: 'modifytime', value: arr[0].modifytime},
+                    {label: '密码', prop: 'password', value: arr[0].password},
+                    {label: '电话', prop: 'phone', value: arr[0].phone},
+                    {label: '用户类型', prop: 'usertype', value: arr[0].usertype},
+                ]
+            } else {
+                this.$message({message: '请选择一个'})
+            }
+        },
         selectionChange(value) {
             // 多选列表
-            this.$store.state.selectionArr = value
+            this.userInfo.selectionArr = value
+        },
+        restore() {
+            // 还原状态
+            this.userInfo.forms = [
+                {label: '用户名', prop: 'loginname', value: ''},
+                {label: '手机号', prop: 'phone', value: ''},
+                {label: '密码', prop: 'password', value: ''},
+            ]
+            
         }
     },
     created() {

@@ -55,7 +55,7 @@
             </el-row>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" size="small" @click="goindex()" class="login-submit">登录</el-button>
+            <el-button type="primary" size="small" @click="goindex" class="login-submit">登录</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -83,14 +83,14 @@
                         password: this.password
                     }
                 ).then((res) => {
-                    console.log('登陆请求:',res)
-                    let token = res.data.data['token'] // 获取token
+                    var token = res.data.data['token'] // 获取token
                     sessionStorage.setItem('token', token) // 设置保存到本地token
+                    this.$axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
+                    this.$router.push('/')
                 }).catch((err) => {
-                    console.log('请求失败')
-                    console.log('失败详情:',err)
+                    alert('请求失败')
+                    // console.log('失败详情:',err)
                 })
-                this.$router.push('/index')
             }
         },
     }

@@ -14,6 +14,7 @@ Vue.config.productionTip = false
 Vue.use(Avue);
 Vue.use(ElementUI);
 
+
 axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 

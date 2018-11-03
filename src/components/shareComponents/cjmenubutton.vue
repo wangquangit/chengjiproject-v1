@@ -11,7 +11,7 @@
                 {{item.buttonname}}
             </el-button>
 
-            <el-dialog title="添加" :visible.sync="addTableVisible">
+            <el-dialog @close="restore" title="添加" :visible.sync="addTableVisible">
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
@@ -28,7 +28,7 @@
                 </div>
             </el-dialog>
 
-            <el-dialog title="修改" :visible.sync="editTableVisible">
+            <el-dialog @close="restore" title="修改" :visible.sync="editTableVisible">
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
@@ -45,7 +45,7 @@
                 </div>
             </el-dialog>
 
-            <el-dialog title="搜索" :visible.sync="searchTableVisible">
+            <el-dialog @close="restore" title="搜索" :visible.sync="searchTableVisible">
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
@@ -63,6 +63,22 @@
                 </div>
             </el-dialog>
 
+            <el-dialog @close="restore" title="详情" :visible.sync="showVisible">
+                <el-form>
+                    <el-form-item
+                        v-for="(item, index) of data.forms"
+                        :key="index"
+                        :label="item.label"
+                        :label-width="formLabelWidth"
+                    >
+                        <el-input :disabled="true" v-model="item.value"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="cancel">关闭</el-button>
+                </div>
+            </el-dialog>
+
     </el-col>
 </template>
 
@@ -75,7 +91,8 @@ export default {
             editTableVisible: false,
             deleteVisible: false,
             searchTableVisible: false,
-            formLabelWidth: '80px'
+            showVisible: false,
+            formLabelWidth: '120px'
         }
     },
     props: {
@@ -86,11 +103,13 @@ export default {
         execute(functionname,data) {
             // BOSS
             this.data = data
-            console.log(functionname)
             this[functionname]()
         },
         addInfo() {
             // 添加表单开启
+            for(var item of this.data.forms){
+                item.value = ''
+            }
             this.addTableVisible = true
         },
         cancel() {
@@ -98,6 +117,7 @@ export default {
             this.addTableVisible = false
             this.editTableVisible = false
             this.searchTableVisible = false
+            this.showVisible = false
             this.$message({message:'取消'})
         },
         addSubmit() {
@@ -108,7 +128,7 @@ export default {
         editInfo() {
             // 向父组件发起请求
             this.$emit('editInfo')
-            if(this.$store.state.selectionArr.length == 1){
+            if(this.data.selectionArr.length == 1){
                 this.editTableVisible = true
             }
         },
@@ -119,12 +139,12 @@ export default {
         },
         del() {
             // 删除方法
-            var itemList = this.$store.state.selectionArr
+            var itemList = this.data.selectionArr
             var str = ''
             for(var item of itemList){
                 str += item.id+','
             }
-            this.$store.state.selectionArr.length >= 1 ?
+            this.data.selectionArr.length >= 1 ?
                 this.deleteVisible = true :
                 this.deleteVisible = false
             if(this.deleteVisible){
@@ -139,6 +159,7 @@ export default {
                     }).then((res) => {
                         this.$message({
                             message: '删除成功',
+                            type: 'success'
                         })
                         this.$emit('deleteOk')
                     }).catch((err) => {
@@ -150,15 +171,30 @@ export default {
                         type:'info'
                     })
                 })
+            } else {
+                this.$message({
+                    message: '请选择一个',
+                    type: 'info'
+                })
             }
         },
         search() {
             // 激活搜索弹窗
             this.searchTableVisible = true
-            console.log(this.data.forms)
         },
         submitSearch() {
-            console.log(this.data.forms)
+            // 提交搜索
+            this.$emit('submitSearch',this.data.forms)
+            this.searchTableVisible = false
+        },
+        showInfo() {
+            this.$emit('showInfo')
+            if(this.data.selectionArr.length == 1){
+                this.showVisible = true
+            }
+        },
+        restore() {
+            this.$emit('restore')
         }
     }
 }

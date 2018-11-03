@@ -74,8 +74,6 @@
         },
         methods: {
             gotourl(listButtons,url) {
-                this.$store.state.nowButtons = listButtons // 将当前组件的按钮添加进全局
-                console.log('listButtons:',this.$store.state.nowButtons)
                 this.$router.push(url)
             },
             changewidth() {
@@ -99,12 +97,12 @@
                     this.loading = false // 加载状态消失
                     this.setMainButtons(response) // 获取按钮后添加到全局
                 }).catch((error) => {
-                    console.log('index请求失败')
+                    this.$router.push('/login')
                 })
             },
             setMainButtons(response) {
                 // 将按钮对象组织后添加到全局
-                let data = response.data
+                var data = response.data
                 for(var item of data){
                     for(var btn of item.children){
                         this.$store.state.mainButtonInfo[btn.url] = btn.listButton
