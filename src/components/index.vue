@@ -1,63 +1,56 @@
 <template>
-    <el-row :gutter="10">
-        <el-col :xs="0" :sm="4">
-            <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
-                <el-radio-button :label="false">展开</el-radio-button>
-                <el-radio-button :label="true">收起</el-radio-button>
-            </el-radio-group> -->
-            <!-- 左侧菜单栏 -->
-            
-            <el-menu 
-                default-active="1-4-1" 
-                class="el-menu-vertical-demo leftmenu" 
-                :collapse="isCollapse"
+    <el-container :style="'height:'+winHeight">
+        <el-menu
+            class="el-menu-vertical-demo leftmenu" 
+            :collapse="isCollapse"
+        >
+            <h3 class="logo">
+                <router-link to="/">
+                    <span>
+                        logo
+                    </span>
+                </router-link>
+            </h3>
+            <h3 v-if="loading">
+                加载中...
+            </h3>
+            <el-submenu 
+                :index="String(menuindex)"
+                v-for="(menu, menuindex) in userMenuInfo"
+                :key="menuindex"
             >
-                <h3 class="logo">
-                    <router-link to="/">
-                        <span>
-                            cjProject -V1.1
-                        </span>
-                    </router-link>
-                </h3>
-                <h3 v-if="loading">
-                    加载中...
-                </h3>
-                <el-submenu 
-                    :index="String(menuindex)"
-                    v-for="(menu, menuindex) in userMenuInfo"
-                    :key="menuindex"
-                >
-                    <template slot="title">
-                        <i class="el-icon-location"></i>
-                        <span>{{menu.name}}</span>
-                    </template>
-                    <el-menu-item-group>
-                        <el-menu-item
-                            v-for="(item, itemindex) in menu.children"
-                            :key="itemindex"
-                            :index="String(menuindex+'-'+itemindex)"
-                            @click="gotourl(item.listButton,item.url)"
-                        >
-                            {{item.name}}
-                        </el-menu-item>
-                    </el-menu-item-group>
-                </el-submenu>
-            </el-menu>
-        </el-col>
-        <el-col :xs="24" :sm="20" class="indexright">
-            <el-container>
-                <el-header class="header">
-                    头部组件
-                </el-header>
-                <el-main class="main">
-                    <keep-alive>
-                        <!-- transition: 过渡效果 -->
-                        <router-view></router-view>
-                    </keep-alive>
-                </el-main>
-            </el-container>
-        </el-col>
-    </el-row>
+                <template slot="title">
+                    <i class="el-icon-location"></i>
+                    <span>{{menu.name}}</span>
+                </template>
+                <el-menu-item-group>
+                    <el-menu-item
+                        v-for="(item, itemindex) in menu.children"
+                        :key="itemindex"
+                        :index="String(menuindex+'-'+itemindex)"
+                        @click="gotourl(item.listButton,item.url)"
+                    >
+                        {{item.name}}
+                    </el-menu-item>
+                </el-menu-item-group>
+            </el-submenu>
+        </el-menu>
+
+        <el-container>
+            <el-header>
+                <el-button @click="changewidth">click me</el-button>
+            </el-header>
+
+            <el-main>
+                <keep-alive>
+                    <!-- transition: 过渡效果 -->
+                    <router-view></router-view>
+                </keep-alive>
+            </el-main>
+
+        </el-container>
+
+    </el-container>
 </template>
 
 <script>
@@ -68,6 +61,7 @@
             return {
                 msg: 'this is index views',
                 isCollapse: false,
+                winHeight: window.innerHeight+'px', // 获取窗口高度
                 manubuttonicon: 'el-icon-d-arrow-left',
                 loading: true, // 左侧菜单栏加载状态
             }
@@ -76,27 +70,17 @@
             gotourl(listButtons,url) {
                 this.$router.push(url)
             },
-            changewidth() {
-                // 触发点击事件修改菜单栏宽度
-                if(!this.isCollapse){
-                    this.isCollapse = true
-                    this.$store.state.mainwidth = 23,
-                    this.$store.state.manuwidth = 1
-                }else{
-                    this.isCollapse = false
-                    this.$store.state.mainwidth = 18,
-                    this.$store.state.manuwidth = 6
-                }
-            },
             getUserMenuInfo() {
                 this.$axios({
                     method: 'post',
                     url: config.serverurl+'/login/getUserPermission',
                 }).then((response) => {
+                    console.log('response:',response)
                     this.$store.state.userMenuInfo = response.data
                     this.loading = false // 加载状态消失
-                    this.setMainButtons(response) // 获取按钮后添加到全局
+                    this.setMainButtons(response) // 获取按钮后添加到全局 // ???
                 }).catch((error) => {
+                    alert('登陆失败:',error)
                     this.$router.push('/login')
                 })
             },
@@ -108,6 +92,9 @@
                         this.$store.state.mainButtonInfo[btn.url] = btn.listButton
                     }
                 }
+            },
+            changewidth() {
+                this.isCollapse = !this.isCollapse
             }
         },
         computed: {
@@ -147,5 +134,9 @@
   }
   .logo{
       margin: 1rem 0;
+  }
+  .el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 300px;
+    min-height: 706px;
   }
 </style>

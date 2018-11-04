@@ -69,11 +69,12 @@
                 msg: 'this is login',
                 username: 'admin',
                 password: '123456',
-                code: '1234'
+                code: '1234',
             }
         },
         methods: {
             goindex(){
+                this.$emit('loadingGo',true)
                 console.log('登陆请求发起!!!')
                 this.$axios.post(
                     config.serverurl+'/login',
@@ -83,12 +84,16 @@
                         password: this.password
                     }
                 ).then((res) => {
+                    this.loading = false
                     var token = res.data.data['token'] // 获取token
                     sessionStorage.setItem('token', token) // 设置保存到本地token
                     this.$axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
                     this.$router.push('/')
+                    this.$emit('loadingGo',false)
                 }).catch((err) => {
                     alert('请求失败')
+                    this.loading = false
+                    this.$emit('loadingGo',false)
                     // console.log('失败详情:',err)
                 })
             }

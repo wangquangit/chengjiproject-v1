@@ -1,5 +1,12 @@
 <template>
-<div class="login-container pull-height" @keyup.enter.native="handleLogin">
+<div 
+  class="login-container pull-height" 
+  @keyup.enter.native="handleLogin"
+  v-loading="loading"
+  element-loading-text="拼命加载中"
+  element-loading-spinner="el-icon-loading"
+  element-loading-background="rgba(0, 0, 0, 0.5)"
+>
     <!-- <div class="login-logo animated fadeIn">
         <img src="/svg/logo.svg" alt="">
     </div> -->
@@ -16,7 +23,10 @@
     <div class="login-border  animated fadeInRight">
         <div class="login-main">
             <h4 class="login-title">Login</h4>
-            <cj-user-login></cj-user-login>
+            <cj-user-login
+              @loadingGo="setLoading"
+              :loading="loading"
+            ></cj-user-login>
         </div>
     </div>
 </div>
@@ -28,12 +38,18 @@
         name: 'cjLogin',
         data() {
             return {
-                msg: '城基项目'
+                msg: '城基项目',
+                loading: false
             }
         },
         components: {
           cjUserLogin
         },
+        methods: {
+          setLoading(value) {
+            this.loading = value
+          }
+        }
     }
 </script>
 
@@ -42,7 +58,7 @@ li{
     list-style: none;
 }
 .login-container {
-  height: 698px;;
+  height: 706px;;
   display: flex;
   justify-content: space-around;
   align-items: center;

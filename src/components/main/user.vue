@@ -8,6 +8,7 @@
         @current-change="currentChange" 
         @refresh-change="refresh"
         @selection-change="selectionChange"
+        @sort-change="sortChange"
     >
         <template slot-scope="scope" slot="menuLeft">
             <cj-main-top-button
@@ -49,10 +50,10 @@ export default {
                 delBtn: false,
                 menu: false,
                 column: [
-                    {label: '用户名', prop: 'loginname'},
-                    {label: '手机号', prop: 'phone'},
+                    {label: '用户名', prop: 'loginname',sortable:true,},
+                    {label: '手机号', prop: 'phone',sortable:true,},
                     // {label: 'ID', prop: 'id'},
-                    {label: '最后修改时间', prop: 'createtime'},
+                    {label: '最后修改时间', prop: 'modifytime',sortable:true,},
                 ]
             },
             loading: false,
@@ -61,7 +62,12 @@ export default {
                 currentPage: 1, // 当前页码
                 total: 0, // 数据总数
                 pageSizes: [10, 20, 30, 40, 50],
-            }
+            },
+            sort: {
+                orderByField: 'createtime',
+                isAsc: true
+            },
+            where: [{}]
         }
     },
     methods: {
@@ -74,8 +80,15 @@ export default {
                 data: {
                     page: this.page.currentPage,
                     limit: this.page.pageSize,
+                    orderByField: this.sort.orderByField,
+                    isAsc: this.sort.isAsc,
+                    where: this.where
                 }
             }).then((res) => {
+                // this.$message({
+                //     message: '共有'+res.data.total+'条数据',
+                //     type: 'success'
+                // })
                 this.getButton()
                 this.loading = false
                 this.data = res.data.records
@@ -153,38 +166,20 @@ export default {
         },
         submitSearch(value) {
             // 搜索表单提交
-            let searchForm = {
-                where: [
-                    {
-                        name: 'truename|loginname',
-                        op: 'like',
-                        value: value[0].value
-                    },
-                    {
-                        name: 'phone',
-                        op: 'eq',
-                        value: value[1].value
-                    }
-                ]
-            }
-            this.$axios({
-                method: 'post',
-                url: config.serverurl+'/user/search',
-                data: {
-                    where: searchForm.where
-                    // ??? 请求时请求数据长度默认为10 ???
+            let searchForm = [
+                {
+                    name: 'truename|loginname',
+                    op: 'like',
+                    value: value[0].value
+                },
+                {
+                    name: 'phone',
+                    op: 'eq',
+                    value: value[1].value
                 }
-            }).then((res) => {
-                this.$message({
-                    message: '共找到'+res.data.total+'条结果!',
-                    type: 'success'
-                })
-                this.data = res.data.records
-                this.page.total = res.data.total
-                this.page.currentPage = res.data.current
-            }).catch((err) => {
-                alert(err)
-            })
+            ]
+            this.where = searchForm
+            this.getInfo()
         },
         showInfo() {
             let arr = this.userInfo.selectionArr
@@ -215,10 +210,22 @@ export default {
                 {label: '密码', prop: 'password', value: ''},
             ]
             
+        },
+        sortChange(value) {
+            console.log(value)
+            this.sort.orderByField = value.prop
+            value.order == 'ascending' ?
+                this.sort.isAsc = true :
+                this.sort.isAsc = false
+            this.getInfo()
         }
     },
     created() {
         this.getInfo()
+    },
+    updated() {
+        console.log('更新后的分页:',this.page)
+        console.log('更新后的排序:',this.sort)
     },
     components: {
         cjMainTopButton
