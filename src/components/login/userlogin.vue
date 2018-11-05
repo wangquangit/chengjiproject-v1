@@ -19,20 +19,19 @@
         </el-form-item>
         <el-form-item prop="password">
             <el-input 
-                type="password" 
+                :type="pwdType" 
                 prefix-icon="el-icon-info" 
                 size="large" 
                 auto-complete="off" 
                 placeholder="请输入密码"
                 v-model="password"
             >
-                <i class="el-icon-view el-input__icon" slot="suffix"></i>
+                <i class="el-icon-view el-input__icon see" @click="seePassword" slot="suffix"></i>
                 <i slot="prefix" class="icon-mima"></i>
             </el-input>
         </el-form-item>
         <el-form-item>
             <el-row >
-                <el-col :span="18">
                     <el-input 
                         prefix-icon="el-icon-more-outline" 
                         size="large"
@@ -41,17 +40,12 @@
                     >
                         <i slot="prefix"
                         class="icon-yanzhengma"></i>
+                    <i slot="suffix" class="login-code">
+                        <span class="login-code-img">
+                            <img src="" alt="">
+                        </span>
+                    </i>
                     </el-input>
-                </el-col>
-                <el-col :span="6">
-                    <div class="login-code">
-                        <span class="login-code-img">1234</span>
-                        <!-- <img src="code.src"
-                            alt="验证码"
-                            class="login-code-img"/> -->
-                        <!-- <i class="icon-shuaxin login-code-icon" @click="refreshCode"></i> -->
-                    </div>
-                </el-col>
             </el-row>
         </el-form-item>
         <el-form-item>
@@ -70,12 +64,12 @@
                 username: 'admin',
                 password: '123456',
                 code: '1234',
+                pwdType: 'password'
             }
         },
         methods: {
             goindex(){
                 this.$emit('loadingGo',true)
-                console.log('登陆请求发起!!!')
                 this.$axios.post(
                     config.serverurl+'/login',
                     {
@@ -91,15 +85,22 @@
                     this.$router.push('/')
                     this.$emit('loadingGo',false)
                 }).catch((err) => {
-                    alert('请求失败')
                     this.loading = false
                     this.$emit('loadingGo',false)
-                    // console.log('失败详情:',err)
                 })
+            },
+            seePassword() {
+                this.pwdType = this.pwdType == 'password' ? '' : 'password'
             }
         },
     }
 </script>
 
 <style scoped>
+.login-code-img{
+    height: 32px;
+}
+.see{
+    cursor: pointer
+}
 </style>

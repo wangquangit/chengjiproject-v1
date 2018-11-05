@@ -75,13 +75,11 @@
                     method: 'post',
                     url: config.serverurl+'/login/getUserPermission',
                 }).then((response) => {
-                    console.log('response:',response)
+                    this.setMainButtons(response) // 获取按钮后添加到全局 // ???
                     this.$store.state.userMenuInfo = response.data
                     this.loading = false // 加载状态消失
-                    this.setMainButtons(response) // 获取按钮后添加到全局 // ???
                 }).catch((error) => {
-                    alert('登陆失败:',error)
-                    this.$router.push('/login')
+                    // this.$router.push('/login')
                 })
             },
             setMainButtons(response) {

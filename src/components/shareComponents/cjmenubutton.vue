@@ -84,6 +84,7 @@
 
 <script>
 import config from '../config';
+import request from '../user_authority.js'
 export default {
     data() {
         return {
@@ -153,18 +154,22 @@ export default {
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$axios({
-                        method: 'delete',
-                        url: config.serverurl+'/user/del/'+str
-                    }).then((res) => {
-                        this.$message({
-                            message: '删除成功',
-                            type: 'success'
-                        })
-                        this.$emit('deleteOk')
-                    }).catch((err) => {
-                        alert('失败')
-                    })
+                    request.postRquest(
+                        [
+                            '/user/del/'+str,
+                            {},
+                            (res) => {
+                                this.$message(
+                                    {
+                                        message: '删除成功',
+                                        type: 'success'
+                                    }
+                                ),
+                                this.$emit('deleteOk')
+                            },
+                            'delete'
+                        ]
+                    )
                 }).catch(() => {
                     this.$message({
                         message: '已取消删除',

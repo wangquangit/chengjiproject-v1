@@ -39,6 +39,11 @@ const router = new Router({
           name: 'user',
           component: () => import('./components/main/user.vue')
         },
+        {
+          path: 'systemparameter',
+          name: 'systemparameter',
+          component: () => import('./components/main/systemparameter.vue')
+        }
       ]
     },
     {

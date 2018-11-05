@@ -17,6 +17,13 @@ Vue.use(ElementUI);
 
 axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+// axios.interceptors.response.use(data => {
+//   if(data.data.code == 11){
+//     return data
+//   }
+// },err => {
+//   return err
+// })
 
 Vue.prototype.$axios = axios
 

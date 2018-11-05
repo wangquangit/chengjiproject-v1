@@ -29,6 +29,7 @@
 <script>
 import config from '../config.js'
 import cjMainTopButton from '../shareComponents/cjmenubutton.vue'
+import request from '../user_authority.js'
 export default {
     data() {
         return {
@@ -72,32 +73,37 @@ export default {
     },
     methods: {
         getInfo() {
-            // 请求数据
             this.loading = true
-            this.$axios({
-                method: 'post',
-                url: config.serverurl+'/user/search',
-                data: {
-                    page: this.page.currentPage,
-                    limit: this.page.pageSize,
-                    orderByField: this.sort.orderByField,
-                    isAsc: this.sort.isAsc,
-                    where: this.where
-                }
-            }).then((res) => {
-                // this.$message({
-                //     message: '共有'+res.data.total+'条数据',
-                //     type: 'success'
-                // })
-                this.getButton()
-                this.loading = false
-                this.data = res.data.records
-                this.page.total = res.data.total
-                this.page.currentPage = res.data.current
-            }).catch((error) => {
-                alert('请求失败')
-            })
+            request.postRquest(
+                [
+                    '/user/search',
+                    {
+                        page: this.page.currentPage,
+                        limit: this.page.pageSize,
+                        orderByField: this.sort.orderByField,
+                        isAsc: this.sort.isAsc,
+                        where: this.where
+                    },
+                    (res) => {
+                        this.loading = false
+                        this.data = res.data.records
+                        this.page.total = res.data.total
+                        if(res.data.records.length == 0){
+                            // 当请求的数据长度为0时,修改请求参数再重新请求
+                            if(res.data.current > 1){
+                                this.page.currentPage = res.data.current - 1
+                                this.getInfo()
+                            } else {
+                                this.page.currentPage = res.data.current
+                            }
+                        }
+                    },
+                    'post'
+                ]
+            ),
+            this.getButton()
         },
+
         getButton() {
             this.buttonList = this.$store.state.mainButtonInfo['user']
         },
@@ -114,21 +120,27 @@ export default {
             // 数据刷新
             this.getInfo()
         },
+
         addInfo(value) {
-            // 获取子组件传递的表单信息
-            this.$axios({
-                method: 'post',
-                url: config.serverurl+'/user/addInfo',
-                params: {
-                    loginname: value[0].value,
-                    phone: value[1].value,
-                    password: value[2].value
-                }
-            }).then((res) => {
-                this.getInfo()
-                this.emptyForms()
-            })
+            var params = {
+                loginname: value[0].value,
+                phone: value[1].value,
+                password: value[2].value
+            }
+            request.postRquest(
+                [
+                    '/user/addInfo',
+                    params,
+                    (res) => {
+                        this.getInfo()
+                        this.emptyForms()
+                    },
+                    'post',
+                    false
+                ]
+            )
         },
+
         editInfo() {
             // 更新当前forms表单
             if(this.userInfo.selectionArr.length == 1){
@@ -146,23 +158,25 @@ export default {
             }
         },
         editSubmit(value) {
-            // 提交修改请求
-            this.$axios({
-                method: 'put',
-                url: config.serverurl+'/user/editInfo',
-                params: {
-                    id: this.userInfo.selectionArr[0].id,
-                    loginname: value[0].value,
-                    phone: value[1].value,
-                    password: value[2].value,
-                }
-            }).then((res) => {
-                this.$message({message:'修改成功', type: 'success'})
-                this.getInfo()
-                this.emptyForms()
-            }).catch((err) => {
-                alert('修改失败')
-            })
+            var params = {
+                id: this.userInfo.selectionArr[0].id,
+                loginname: value[0].value,
+                phone: value[1].value,
+                password: value[2].value,
+            }
+            request.postRquest(
+                [
+                    '/user/editInfo',
+                    params,
+                    (res) => {
+                        this.$message({message:'修改成功', type: 'success'})
+                        this.getInfo()
+                        this.emptyForms()
+                    },
+                    'put',
+                    false
+                ]
+            )
         },
         submitSearch(value) {
             // 搜索表单提交
@@ -178,6 +192,7 @@ export default {
                     value: value[1].value
                 }
             ]
+            this.page.currentPage = 1
             this.where = searchForm
             this.getInfo()
         },
@@ -212,7 +227,6 @@ export default {
             
         },
         sortChange(value) {
-            console.log(value)
             this.sort.orderByField = value.prop
             value.order == 'ascending' ?
                 this.sort.isAsc = true :
@@ -224,8 +238,7 @@ export default {
         this.getInfo()
     },
     updated() {
-        console.log('更新后的分页:',this.page)
-        console.log('更新后的排序:',this.sort)
+        this.getButton()
     },
     components: {
         cjMainTopButton
@@ -234,5 +247,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
