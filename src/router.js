@@ -53,19 +53,5 @@ const router = new Router({
   ]
 })
 
-// 路由、守卫
-// router.beforeEach((to, form, next) => {
-//   if(to.path !== '/login'){
-//     let token = sessionStorage.getItem('Authorization')
-//     if(token === null || token === ''){
-//       next('/login')
-//     } else {
-//       next('/')
-//     }
-//   } else {
-//       next('/login')
-//   }
-// })
-
 
 export default router

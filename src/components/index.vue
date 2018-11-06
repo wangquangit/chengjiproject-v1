@@ -56,6 +56,7 @@
 <script>
     import { mapState } from 'vuex';
     import config from './config.js'
+    import request from './user_authority.js'
     export default{
         data() {
             return {
@@ -71,23 +72,27 @@
                 this.$router.push(url)
             },
             getUserMenuInfo() {
-                this.$axios({
-                    method: 'post',
-                    url: config.serverurl+'/login/getUserPermission',
-                }).then((response) => {
-                    this.setMainButtons(response) // 获取按钮后添加到全局 // ???
-                    this.$store.state.userMenuInfo = response.data
-                    this.loading = false // 加载状态消失
-                }).catch((error) => {
-                    // this.$router.push('/login')
-                })
+                request.postRquest(
+                    [
+                        '/login/getUserPermission',
+                        'post',
+                        {},
+                        (response) => {
+                            this.$store.state.userMenuInfo = response.data
+                            this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
+                            this.loading = false // 加载状态消失
+                        },
+                        false
+                    ]
+                )
             },
             setMainButtons(response) {
                 // 将按钮对象组织后添加到全局
-                var data = response.data
-                for(var item of data){
-                    for(var btn of item.children){
-                        this.$store.state.mainButtonInfo[btn.url] = btn.listButton
+
+                for(var index in response){
+                    for(var item in response[index].children) {
+                        this.$store.state.mainButtonInfo[response[index].children[item].url]
+                            = response[index].children[item].listButton
                     }
                 }
             },

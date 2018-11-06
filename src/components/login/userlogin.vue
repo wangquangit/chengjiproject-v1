@@ -56,11 +56,11 @@
 
 <script>
     import config from '../config.js'
+    import request from '../user_authority.js'
     export default{
         name: 'cjUserLogin',
         data() {
             return {
-                msg: 'this is login',
                 username: 'admin',
                 password: '123456',
                 code: '1234',
@@ -70,26 +70,37 @@
         methods: {
             goindex(){
                 this.$emit('loadingGo',true)
-                this.$axios.post(
-                    config.serverurl+'/login',
-                    {
-                        code: this.code,
-                        loginname: this.username,
-                        password: this.password
-                    }
-                ).then((res) => {
-                    this.loading = false
-                    var token = res.data.data['token'] // 获取token
-                    sessionStorage.setItem('token', token) // 设置保存到本地token
-                    this.$axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
-                    this.$router.push('/')
-                    this.$emit('loadingGo',false)
-                }).catch((err) => {
-                    this.loading = false
-                    this.$emit('loadingGo',false)
-                })
+                request.postRquest(
+                    [
+                        '/login',
+                        'post',
+                        {
+                            code: this.code,
+                            loginname: this.username,
+                            password: this.password
+                        },
+                        (res) => {
+                            if(res.data.code > 1){
+                                var token = res.data.data.token
+                                sessionStorage.setItem('token', token)
+                                sessionStorage.setItem('loginname', this.username)
+                                sessionStorage.setItem('password', this.password)
+                                this.$router.push('/')
+                            } else {
+                                this.$emit('loadingGo',false)
+                                this.$message(
+                                    {
+                                        message: '账号或密码错误',
+                                        type: 'warning'
+                                    }
+                                )
+                            }
+                        }
+                    ]
+                )
             },
             seePassword() {
+                // 设置密码可见
                 this.pwdType = this.pwdType == 'password' ? '' : 'password'
             }
         },

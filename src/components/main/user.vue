@@ -17,7 +17,7 @@
                 @addSubmit="addInfo"
                 @editInfo="editInfo"
                 @editSubmit="editSubmit"
-                @deleteOk="getInfo"
+                @deleteForm="deleteForm"
                 @submitSearch="submitSearch"
                 @showInfo="showInfo"
                 @restore="restore"
@@ -35,11 +35,16 @@ export default {
         return {
             userInfo: {
                 forms: [
+                    {label: 'id', prop: 'id', value: ''},
                     {label: '用户名', prop: 'loginname', value: ''},
                     {label: '手机号', prop: 'phone', value: ''},
                     {label: '密码', prop: 'password', value: ''},
                 ],
                 selectionArr: [],
+                formTitle: {
+                    idFiled: 'id',
+                    titleFiled: 'loginname'
+                }
             },
             buttonList: [],
             data: [],
@@ -50,6 +55,7 @@ export default {
                 addBtn: false,
                 delBtn: false,
                 menu: false,
+                stripe: true,
                 column: [
                     {label: '用户名', prop: 'loginname',sortable:true,},
                     {label: '手机号', prop: 'phone',sortable:true,},
@@ -65,8 +71,8 @@ export default {
                 pageSizes: [10, 20, 30, 40, 50],
             },
             sort: {
-                orderByField: 'createtime',
-                isAsc: true
+                orderByField: 'modifytime',
+                isAsc: false
             },
             where: [{}]
         }
@@ -77,6 +83,7 @@ export default {
             request.postRquest(
                 [
                     '/user/search',
+                    'post',
                     {
                         page: this.page.currentPage,
                         limit: this.page.pageSize,
@@ -85,25 +92,27 @@ export default {
                         where: this.where
                     },
                     (res) => {
-                        this.loading = false
-                        this.data = res.data.records
-                        this.page.total = res.data.total
-                        if(res.data.records.length == 0){
-                            // 当请求的数据长度为0时,修改请求参数再重新请求
-                            if(res.data.current > 1){
-                                this.page.currentPage = res.data.current - 1
-                                this.getInfo()
-                            } else {
-                                this.page.currentPage = res.data.current
+                        this.getButton()
+                        if(this.buttonList) {
+                            this.loading = false
+                            this.data = res.data.records
+                            this.page.total = res.data.total
+                            if(res.data.records.length == 0){
+                                // 当请求的数据长度为0时,修改请求参数再重新请求
+                                if(res.data.current > 1){
+                                    this.page.currentPage = res.data.current - 1
+                                    this.getInfo()
+                                } else {
+                                    this.page.currentPage = res.data.current
+                                }
                             }
+                        } else {
+                            this.getInfo()
                         }
                     },
-                    'post'
                 ]
-            ),
-            this.getButton()
+            )
         },
-
         getButton() {
             this.buttonList = this.$store.state.mainButtonInfo['user']
         },
@@ -120,36 +129,20 @@ export default {
             // 数据刷新
             this.getInfo()
         },
-
         addInfo(value) {
-            var params = {
-                loginname: value[0].value,
-                phone: value[1].value,
-                password: value[2].value
-            }
+            var params = config.formJson(value);
             request.postRquest(
                 [
                     '/user/addInfo',
+                    'post',
                     params,
                     (res) => {
                         this.getInfo()
                         this.emptyForms()
                     },
-                    'post',
                     false
                 ]
             )
-        },
-
-        editInfo() {
-            // 更新当前forms表单
-            if(this.userInfo.selectionArr.length == 1){
-                this.userInfo.forms[0].value = this.userInfo.selectionArr[0].loginname
-                this.userInfo.forms[1].value = this.userInfo.selectionArr[0].phone
-                this.userInfo.forms[2].value = this.userInfo.selectionArr[0].password
-            } else {
-                this.$message({message:'修改时一次只能选择一个'})
-            }
         },
         emptyForms() {
             // 清空表单value值
@@ -157,24 +150,49 @@ export default {
                 item.value = ''
             }
         },
-        editSubmit(value) {
-            var params = {
-                id: this.userInfo.selectionArr[0].id,
-                loginname: value[0].value,
-                phone: value[1].value,
-                password: value[2].value,
+        editInfo() {
+            // 更新当前forms表单
+            if(this.userInfo.selectionArr.length > 0){
+                for (var i = 0; i < this.userInfo.forms.length; i++) {
+                    this.userInfo.forms[i].value = this.userInfo.selectionArr[0][this.userInfo.forms[i].prop];
+                }
+            } else {
+                this.$message({message:'请选择需要修改的项'})
             }
+        },
+        editSubmit(value) {
+            // 修改提交
+            var params = config.formJson(value);
+            params.id = this.userInfo.selectionArr[0].id;
             request.postRquest(
                 [
                     '/user/editInfo',
+                    'put',
                     params,
                     (res) => {
                         this.$message({message:'修改成功', type: 'success'})
                         this.getInfo()
                         this.emptyForms()
                     },
-                    'put',
                     false
+                ]
+            )
+        },
+        deleteForm(value) {
+            request.postRquest(
+                [
+                    '/user/del/'+value,
+                    'delete',
+                    {},
+                    (res) => {
+                        this.getInfo()
+                        this.$message(
+                            {
+                                message: '删除成功',
+                                type: 'success'
+                            }
+                        )
+                    },
                 ]
             )
         },
@@ -198,7 +216,7 @@ export default {
         },
         showInfo() {
             let arr = this.userInfo.selectionArr
-            if(arr.length == 1){
+            if(arr.length > 0){
                 this.userInfo.forms = [
                     {label: '公司ID', prop: 'companyid', value: arr[0].companyid},
                     {label: '创建时间', prop: 'createtime', value: arr[0].createtime},
@@ -220,6 +238,7 @@ export default {
         restore() {
             // 还原状态
             this.userInfo.forms = [
+                {label: 'id', prop: 'id', value: ''},
                 {label: '用户名', prop: 'loginname', value: ''},
                 {label: '手机号', prop: 'phone', value: ''},
                 {label: '密码', prop: 'password', value: ''},
@@ -232,17 +251,14 @@ export default {
                 this.sort.isAsc = true :
                 this.sort.isAsc = false
             this.getInfo()
-        }
+        },
     },
     created() {
         this.getInfo()
     },
-    updated() {
-        this.getButton()
-    },
     components: {
         cjMainTopButton
-    }
+    },
 }
 </script>
 

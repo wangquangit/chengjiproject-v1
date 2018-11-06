@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import axios from 'axios'
+
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -15,8 +15,6 @@ Vue.use(Avue);
 Vue.use(ElementUI);
 
 
-axios.defaults.headers.common['authorization'] = sessionStorage.getItem('token')
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 // axios.interceptors.response.use(data => {
 //   if(data.data.code == 11){
 //     return data
@@ -25,7 +23,7 @@ axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 //   return err
 // })
 
-Vue.prototype.$axios = axios
+
 
 new Vue({
   router,

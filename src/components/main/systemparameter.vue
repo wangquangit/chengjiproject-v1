@@ -193,17 +193,9 @@ export default {
   },
   methods: {
     message (row) {
-      console.log(row)
     },
-    getInfo() {
-      this.$axios({
-        method: 'post',
-        url: config.serverurl+''
-      })
-    }
   },
   created() {
-    this.getInfo()
   }
 }
 </script>

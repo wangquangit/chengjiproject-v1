@@ -18,6 +18,7 @@
                         :key="index"
                         :label="item.label"
                         :label-width="formLabelWidth"
+                        v-if="item.label != 'id'"
                     >
                         <el-input v-model="item.value"></el-input>
                     </el-form-item>
@@ -28,13 +29,14 @@
                 </div>
             </el-dialog>
 
-            <el-dialog @close="restore" title="修改" :visible.sync="editTableVisible">
+            <el-dialog @close="restore" :title="'修改-'+title" :visible.sync="editTableVisible">
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
                         :key="index"
                         :label="item.label"
                         :label-width="formLabelWidth"
+                        v-if="item.label != 'id'"
                     >
                         <el-input v-model="item.value"></el-input>
                     </el-form-item>
@@ -93,7 +95,8 @@ export default {
             deleteVisible: false,
             searchTableVisible: false,
             showVisible: false,
-            formLabelWidth: '120px'
+            formLabelWidth: '120px',
+            title: ''
         }
     },
     props: {
@@ -119,7 +122,6 @@ export default {
             this.editTableVisible = false
             this.searchTableVisible = false
             this.showVisible = false
-            this.$message({message:'取消'})
         },
         addSubmit() {
             // 提交表单传给子组件
@@ -129,7 +131,8 @@ export default {
         editInfo() {
             // 向父组件发起请求
             this.$emit('editInfo')
-            if(this.data.selectionArr.length == 1){
+            if(this.data.selectionArr.length > 0){
+                this.title = this.data.selectionArr[0][this.data.formTitle.titleFiled]
                 this.editTableVisible = true
             }
         },
@@ -140,41 +143,26 @@ export default {
         },
         del() {
             // 删除方法
+            this.title = ''
             var itemList = this.data.selectionArr
             var str = ''
             for(var item of itemList){
-                str += item.id+','
+                this.title += ' '+item[this.data.formTitle.titleFiled]+','
+                str += item[this.data.formTitle.idFiled]+','
+            }
+            if(this.title.length > 0){
+                this.title = this.title.substring(0,this.title.length-1)
             }
             this.data.selectionArr.length >= 1 ?
                 this.deleteVisible = true :
                 this.deleteVisible = false
             if(this.deleteVisible){
-                this.$confirm('此操作将永久删除选中信息, 是否继续','提示!', {
+                this.$confirm('是否删除 '+this.title,'提示!', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    request.postRquest(
-                        [
-                            '/user/del/'+str,
-                            {},
-                            (res) => {
-                                this.$message(
-                                    {
-                                        message: '删除成功',
-                                        type: 'success'
-                                    }
-                                ),
-                                this.$emit('deleteOk')
-                            },
-                            'delete'
-                        ]
-                    )
-                }).catch(() => {
-                    this.$message({
-                        message: '已取消删除',
-                        type:'info'
-                    })
+                    this.$emit('deleteForm', str)
                 })
             } else {
                 this.$message({
@@ -194,14 +182,14 @@ export default {
         },
         showInfo() {
             this.$emit('showInfo')
-            if(this.data.selectionArr.length == 1){
+            if(this.data.selectionArr.length > 0){
                 this.showVisible = true
             }
         },
         restore() {
             this.$emit('restore')
         }
-    }
+    },
 }
 </script>
 
