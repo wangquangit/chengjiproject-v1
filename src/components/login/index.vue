@@ -20,8 +20,8 @@
             </ul>
         </div>
     </div> -->
-    <div class="login-border  animated fadeInRight">
-        <div class="login-main">
+    <div class="login-border">
+        <div class="animated zoomIn login-main">
             <h4 class="login-title">Login</h4>
             <cj-user-login
               @loadingGo="setLoading"

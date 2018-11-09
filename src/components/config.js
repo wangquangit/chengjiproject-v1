@@ -17,8 +17,5 @@ export default{
         }
         return obj
     },
-
-    setButtons: function () {
-        
-    }
+    
 }

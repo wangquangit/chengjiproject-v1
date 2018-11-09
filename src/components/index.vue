@@ -88,7 +88,6 @@
             },
             setMainButtons(response) {
                 // 将按钮对象组织后添加到全局
-
                 for(var index in response){
                     for(var item in response[index].children) {
                         this.$store.state.mainButtonInfo[response[index].children[item].url]

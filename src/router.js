@@ -40,6 +40,11 @@ const router = new Router({
           component: () => import('./components/main/user.vue')
         },
         {
+          path: 'department',
+          name: 'department',
+          component: () => import('./components/main/sysdepartment.vue')
+        },
+        {
           path: 'systemparameter',
           name: 'systemparameter',
           component: () => import('./components/main/systemparameter.vue')

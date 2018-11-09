@@ -4,14 +4,14 @@
         status-icon
         ref="loginForm"
     >
-        <el-form-item prop="username">
+        <el-form-item prop="loginname">
             <el-input
                 prefix-icon="el-icon-news" 
                 size="large"
                 auto-complete="off"
                 placeholder="请输入用户名"
                 autofocus='true'
-                v-model="username"
+                v-model="loginname"
             >
                 <i slot="prefix"
                 class="icon-yonghu"></i>
@@ -61,7 +61,7 @@
         name: 'cjUserLogin',
         data() {
             return {
-                username: 'admin',
+                loginname: 'admin',
                 password: '123456',
                 code: '1234',
                 pwdType: 'password'
@@ -76,14 +76,14 @@
                         'post',
                         {
                             code: this.code,
-                            loginname: this.username,
+                            loginname: this.loginname,
                             password: this.password
                         },
                         (res) => {
                             if(res.data.code > 1){
                                 var token = res.data.data.token
                                 sessionStorage.setItem('token', token)
-                                sessionStorage.setItem('loginname', this.username)
+                                sessionStorage.setItem('loginname', this.loginname)
                                 sessionStorage.setItem('password', this.password)
                                 this.$router.push('/')
                             } else {

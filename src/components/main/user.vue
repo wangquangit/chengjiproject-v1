@@ -35,7 +35,7 @@ export default {
         return {
             userInfo: {
                 forms: [
-                    {label: 'id', prop: 'id', value: ''},
+                    // {label: 'id', prop: 'id', value: ''},
                     {label: '用户名', prop: 'loginname', value: ''},
                     {label: '手机号', prop: 'phone', value: ''},
                     {label: '密码', prop: 'password', value: ''},

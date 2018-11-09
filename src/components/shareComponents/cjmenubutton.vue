@@ -51,7 +51,6 @@
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
-                        v-if="item.prop != 'password'"
                         :key="index"
                         :label="item.label"
                         :label-width="formLabelWidth"
@@ -173,6 +172,13 @@ export default {
         },
         search() {
             // 激活搜索弹窗
+            var arr = this.data.forms
+            // 过滤掉id和密码
+            for(var item in arr){
+                if(arr[item].prop == 'id' || arr[item].prop == 'password'){
+                    arr.splice(item,1)
+                }
+            }
             this.searchTableVisible = true
         },
         submitSearch() {

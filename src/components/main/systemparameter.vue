@@ -193,6 +193,7 @@ export default {
   },
   methods: {
     message (row) {
+      this.$message(row.event)
     },
   },
   created() {
