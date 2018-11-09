@@ -40,10 +40,15 @@
             <el-header>
                 <el-button @click="changewidth">click me</el-button>
             </el-header>
-
+            <el-row>
+                <el-col :span="24">
+                    <div class="grid-content bg-purple-dark">
+                        <cj-tags></cj-tags>
+                    </div>
+                </el-col>
+            </el-row>
             <el-main>
                 <keep-alive>
-                    <!-- transition: 过渡效果 -->
                     <router-view></router-view>
                 </keep-alive>
             </el-main>
@@ -57,6 +62,7 @@
     import { mapState } from 'vuex';
     import config from './config.js'
     import request from './user_authority.js'
+    import cjTags from './shareComponents/cjtags.vue'
     export default{
         data() {
             return {
@@ -105,6 +111,9 @@
         created() {
             this.getUserMenuInfo()
         },
+        components: {
+            cjTags
+        }
     }
 </script>
 

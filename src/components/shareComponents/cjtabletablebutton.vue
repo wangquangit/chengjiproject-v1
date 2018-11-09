@@ -4,7 +4,6 @@
             <el-col :span="24">
                 <div class="grid-content bg-purple">
                     <el-button type="primary" class="cjbutton" size="small" @click="addInfo">添加</el-button>
-                    <el-button class="cjbutton" size="small" @click="search">搜索</el-button>
                 </div>
             </el-col>
         </el-row>

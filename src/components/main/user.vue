@@ -69,6 +69,7 @@ export default {
                 currentPage: 1, // 当前页码
                 total: 0, // 数据总数
                 pageSizes: [10, 20, 30, 40, 50],
+                pageSize: 10
             },
             sort: {
                 orderByField: 'modifytime',
@@ -79,18 +80,20 @@ export default {
     },
     methods: {
         getInfo() {
+            let params = {
+                page: this.page.currentPage,
+                limit: this.page.pageSize,
+                orderByField: this.sort.orderByField,
+                isAsc: this.sort.isAsc,
+                where: this.where,
+            }
+            console.log('params:',params)
             this.loading = true
             request.postRquest(
                 [
                     '/user/search',
                     'post',
-                    {
-                        page: this.page.currentPage,
-                        limit: this.page.pageSize,
-                        orderByField: this.sort.orderByField,
-                        isAsc: this.sort.isAsc,
-                        where: this.where
-                    },
+                    params,
                     (res) => {
                         this.getButton()
                         if(this.buttonList) {
@@ -100,11 +103,14 @@ export default {
                             if(res.data.records.length == 0){
                                 // 当请求的数据长度为0时,修改请求参数再重新请求
                                 if(res.data.current > 1){
+                                    console.log('a')
                                     this.page.currentPage = res.data.current - 1
                                     this.getInfo()
                                 } else {
                                     this.page.currentPage = res.data.current
                                 }
+                            } else {
+                                this.page.currentPage = res.data.current
                             }
                         } else {
                             this.getInfo()
@@ -122,7 +128,8 @@ export default {
             this.getInfo()
         },
         currentChange(value) {
-            this.page.current = value
+            console.log('page:',value)
+            this.page.currentPage = value
             this.getInfo()
         },
         refresh() {

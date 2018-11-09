@@ -40,14 +40,16 @@ const router = new Router({
           component: () => import('./components/main/user.vue')
         },
         {
+          // 部门
           path: 'department',
           name: 'department',
           component: () => import('./components/main/sysdepartment.vue')
         },
         {
-          path: 'systemparameter',
-          name: 'systemparameter',
-          component: () => import('./components/main/systemparameter.vue')
+          // 区域
+          path: 'sysarea',
+          name: 'sysarea',
+          component: () => import('./components/main/sysarea.vue')
         }
       ]
     },

@@ -50,22 +50,18 @@ export default {
                         width: 300
                     },
                     {
-                        text: '区域',
-                        value: 'area_name_text',
+                        text: '部门编号',
+                        value: 'department_code'
                     },
                     {
-                        text: '区域编号',
-                        value: 'area_id'
+                        text: '区域',
+                        value: 'area_name_text',
                     },
                     {
                         text: '最后更新时间',
                         value: 'updated_time',
                         width: 155
                     },
-                    {
-                        text: '部门编号',
-                        value: 'department_code'
-                    }
                 ],
                 data: [],
                 areaObj: {},
@@ -111,7 +107,6 @@ export default {
             )
         },
         addSubmit(forms, message) {
-            console.log('addinfo:',forms)
             var params
             if(message) {
                 params = {
@@ -121,7 +116,7 @@ export default {
                     area_name_text: forms[0].name,
                     department_leavel: message.department_leavel, // 部门等级
                     department_name: forms[1].name, // 部门名称
-                    parent_id: message.parent_id, // 父级id
+                    parent_id: message.id, // 父级id
                     updated_by: 'admin', // 修改人
                 }
             } else {
@@ -158,8 +153,7 @@ export default {
         },
         editSubmit(info, message) {
             // 修改
-            console.log('editinfo:',info)
-            console.log('editmessage:',message)
+            if(info.forms[0]){}
             request.postRquest(
                 [
                     '/sysdepartment/editInfo',
@@ -171,7 +165,6 @@ export default {
                         department_code: info.forms[2].name
                     },
                     (res) => {
-                        console.log('put:',res)
                         this.getInfo()
                     },
                     false

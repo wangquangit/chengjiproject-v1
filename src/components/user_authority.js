@@ -56,7 +56,7 @@ export default{
             requestParams
         ).then((res) => {
             // eslint-disable-next-line no-console
-            // console.log(res)
+            console.log(res)
             if (res.data.code == -12){
                 //token超时
                 GetToken(netHelper, args)

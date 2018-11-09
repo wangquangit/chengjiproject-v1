@@ -1,10 +1,10 @@
 <template>
     <div>
-        <el-button size="small" type="primary" @click="addInfo">
+        <el-button size="small" type="success" @click="addInfo">
             增加
         </el-button>
-        <el-button size="small" type="info" @click="editInfo">
-            编辑
+        <el-button size="small" type="warning" @click="editInfo">
+            修改
         </el-button>
         <el-button size="small" type="danger" @click="delInfo">
             删除
@@ -83,14 +83,13 @@ export default {
             delWindow: false,
             areaWindow: false,
             formLabelWidth: '120px',
-            msg: 'this is select',
-            filterText: '',
-            filterId: '',
             data: [],
             defaultProps: {
                 children: 'children',
                 label: 'name'
-            }
+            },
+            filterText: '',
+            filterId: ''
         }
     },
     watch: {
@@ -104,25 +103,28 @@ export default {
             if (!value) return true;
             return data.name.indexOf(value) !== -1;
         },
-        getnode(value) {
-            console.log('value:',value)
+        getnode(val) {
             // 节点被选择时的回调,赋值选中的区域的值
-            this.filterText = value.name
-            this.filterId = value.id
-            this.info.forms[0].name = value.name
-            this.info.forms[0].value = value.id
-            console.log('修改后的表单:',this.info.forms)
+            this.filterText = val.name
+            this.filterId = val.id
+            this.info.forms[0].name = val.name
+            this.info.forms[0].value = val.id
         },
         submitTree() {
-            // 选择区域后赋值ID,和name
-            this.info.forms[0].name = this.filterText
-            this.info.forms[0].value = this.filterId
+            // 选择确定关闭区域选择弹窗
             this.areaWindow = false
+        },
+        treecancel() {
+            // 选择取消关闭区域选择弹窗
+            this.areaWindow = false
+            this.filterText = ''
+            this.filterId = ''
         },
         addInfo() {
             // 添加按钮被执行
-            this.data = this.info.getAreaCommon
-            this.addWindow = true
+            this.restoreForms()
+            this.data = this.info.getAreaCommon // 赋值区域树
+            this.addWindow = true // 开启弹窗
         },
         focus(item) {
             // 区域选择输入框获取焦点时激活弹窗
@@ -130,25 +132,22 @@ export default {
                 this.areaWindow = true
             }
         },
-        handleArea(item, obj) {
-            // 将区域编码转换为中文字符
-            for(var i in obj) {
-                if(item == obj[i].id) {
-                    this.info.forms[0].code = this.info.forms[0].value
-                    this.info.forms[0].value = obj[i].name
-                    console.log('aa')
-                } else {
-                    this.handleArea(item, obj[i].children)
-                }
-            }
-        },
+        // handleArea(item, obj) {
+        //     // 将区域编码转换为中文字符
+        //     for(var i in obj) {
+        //         if(item == obj[i].id) {
+        //             this.info.forms[0].value = obj[i].id
+        //             this.info.forms[0].name = obj[i].name
+        //         } else {
+        //             this.handleArea(item, obj[i].children)
+        //         }
+        //     }
+        // },
         addSubmit() {
             // 提交添加信息
-            console.log('info.forms:',this.info)
-            // this.info.forms[0].value = this.filterId
+            this.info.forms[0].value = this.filterId
             this.$emit('addSubmit',this.info.forms, this.message)
             this.addWindow = false
-            this.restoreForms()
         },
         restoreForms() {
             // 还原状态
@@ -160,7 +159,7 @@ export default {
         editInfo() {
             this.data = this.info.getAreaCommon
             this.$emit('editInfo', this.message)
-            this.handleArea(this.message.area_id, this.info.getAreaCommon)
+            // this.handleArea(this.message.area_id, this.info.getAreaCommon)
             this.editWindow = true
         },
         editSubmit() {
@@ -173,10 +172,8 @@ export default {
         },
         cancel() {
             this.addWindow = false
+            this.editWindow = false
         },
-        treecancel() {
-            this.areaWindow = false
-        }
     },
     props: {
         message: Object,

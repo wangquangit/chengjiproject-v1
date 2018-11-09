@@ -12,7 +12,7 @@ export default new Vuex.Store({
     userMenuInfo: [],
     nowButtons: [],
     selectionArr: [],
-    mainButtonInfo: {}
+    mainButtonInfo: {},
   },
   mutations: {
 
