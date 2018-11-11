@@ -1,31 +1,31 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <el-row type="flex" class="row-bg" justify="space-between">
-            <!-- 上部按钮 -->
             <el-col :span="24">
                 <div class="grid-content bg-purple">
-                    <cj-table-tree-button
+                    <cj-right-button
+                        :buttonList="topButton"
                         :info="info"
                         @addSubmit="addSubmit"
-                    ></cj-table-tree-button>
+                    >
+                    </cj-right-button>
                 </div>
             </el-col>
         </el-row>
 
-        <avue-tree-table 
-            :option="option"
-        >
-            <el-table-column label="操作" width="220px">
+        <avue-tree-table :option="option">
+            <el-table-column label="操作" width="270px">
                 <template slot-scope="scope">
-                    <!-- 右侧按钮 -->
-                    <cj-handle-button 
-                        :message="scope.row"
+                    <cj-right-button
+                        :buttonList="buttonList"
                         :info="info"
+                        :message="scope.row"
                         @addSubmit="addSubmit"
-                        @delInfo="delInfo"
-                        @editInfo="editInfo"
+                        @get="get"
                         @editSubmit="editSubmit"
-                    ></cj-handle-button>
+                        @delSubmit="delSubmit"
+                    >
+                    </cj-right-button>
                 </template>
             </el-table-column>
         </avue-tree-table>
@@ -34,8 +34,8 @@
 
 <script>
 import config from '../config.js'
-import cjTableTreeButton from '../shareComponents/cjtabletablebutton.vue'
-import cjHandleButton from '../shareComponents/cjhandlebutton.vue'
+// import cjTableTreeButton from '../shareComponents/cjtabletablebutton.vue'
+import cjRightButton from '../shareComponents/cjrightbutton.vue'
 import request from '../user_authority.js'
 export default {
     data () {
@@ -64,36 +64,50 @@ export default {
                     },
                 ],
                 data: [],
-                areaObj: {},
             },
             info: {
                 // 传给子组件的表单
                 forms: [
-                    {label:'选择区域', prop: 'area_id',value: '', name: ''},
-                    {label:'部门名称', prop: 'department_name',value: '', name: ''},
-                    {label:'部门编号', prop: 'department_code',value: '', name: ''},
+                    {name:'选择区域', label: 'area_id',value: '', select: true},
+                    {name:'部门名称', label: 'department_name',value: ''},
+                    {name:'部门编号', label: 'department_code',value: ''},
                 ],
-                getAreaCommon: [] // 区域详情
+                getAreaCommon: [], // 区域详情
+                title: '部门'
             },
+            buttonList: [],
+            topButton: [],
+            loading: false
         }
     },
     methods: {
         getInfo() {
             // 请求部门表单接口
             this.loading = true
-            request.postRquest(
-                [
-                    '/sysdepartment/getDepartment',
-                    'post',
-                    {},
-                    (res) => {
-                        this.option.data = res.data
-                        this.getRegional()
+            this.getButton()
+            if(this.buttonList) {
+                this.setTopButton()
+                request.postRquest(
+                    [
+                        '/sysdepartment/getDepartment',
+                        'post',
+                        {},
+                        (res) => {
+                            this.option.data = res.data
+                            this.loading = false
+                        },
+                    ]
+                )
+            } else {
+                setTimeout(
+                    () => {
+                        this.getInfo()
                     },
-                ]
-            )
+                    3000
+                )
+            }
         },
-        getRegional() {
+        getArea() {
             // 请求公共接口
             request.postRquest(
                 [
@@ -106,26 +120,36 @@ export default {
                 ]
             )
         },
-        addSubmit(forms, message) {
+        setTopButton() {
+            // 设置顶部按钮
+            for(var i of this.buttonList) {
+                if(i.buttonname == '添加' && this.topButton.length <= 0) {
+                    this.topButton.push(i)
+                }
+            }
+        },
+        getButton() {
+            // 获取按钮
+            this.buttonList = this.$store.state.mainButtonInfo['department']
+        },
+        addSubmit(forms, message, area) {
             var params
             if(message) {
                 params = {
-                    area_id: forms[0].value, // 区域ID
+                    area_id: area.id, // 区域ID
                     created_by: 'admin', // 创建人
-                    department_code: forms[2].name, // 部门编号
-                    area_name_text: forms[0].name,
+                    department_code: forms.forms[2].value, // 部门编号
                     department_leavel: message.department_leavel, // 部门等级
-                    department_name: forms[1].name, // 部门名称
+                    department_name: forms.forms[1].value, // 部门名称
                     parent_id: message.id, // 父级id
                     updated_by: 'admin', // 修改人
                 }
             } else {
                 params = {
-                    area_id: forms[0].value, // 区域ID
+                    area_id: area.id, // 区域ID
                     created_by: 'admin', // 创建人
-                    department_code: forms[2].name, // 部门编号
-                    area_name_text: forms[0].name,
-                    department_name: forms[1].name, // 部门名称
+                    department_code: forms.forms[2].value, // 部门编号
+                    department_name: forms.forms[1].value, // 部门名称
                     updated_by: 'admin', // 修改人
                 }
             }
@@ -136,7 +160,7 @@ export default {
                     params,
                     (res) => {
                         this.$message({
-                            message: '添加成功',
+                            message: res.data.msg,
                             type: 'success'
                         })
                         this.getInfo()
@@ -145,33 +169,41 @@ export default {
                 ]
             )
         },
-        editInfo(message) {
-            this.info.forms[0].value = message.parent_id
-            this.info.forms[0].name = message.area_name_text
-            this.info.forms[1].name = message.department_name
-            this.info.forms[2].name = message.department_code
+        get(message) {
+            this.info.forms[0].value = message.area_name_text
+            this.info.forms[1].value = message.department_name
+            this.info.forms[2].value = message.department_code
         },
-        editSubmit(info, message) {
+        editSubmit(info, message, area) {
             // 修改
-            if(info.forms[0]){}
+            if (area.id) {
+                var area_id = area.id
+            } else {
+                var area_id = message.area_id
+            }
+            var id = message.id
+            var department_name = info.forms[1].value
+            var department_code = info.forms[2].value
             request.postRquest(
                 [
                     '/sysdepartment/editInfo',
                     'put',
                     {
-                        id: message.id,
-                        area_id: info.forms[0].value,
-                        department_name: info.forms[1].name,
-                        department_code: info.forms[2].name
+                        id: id,
+                        area_id: area_id,
+                        department_name: department_name,
+                        department_code: department_code,
                     },
                     (res) => {
+                        console.log("res:",res)
                         this.getInfo()
                     },
                     false
                 ]
             )
         },
-        delInfo(message) {
+        delSubmit(message) {
+            console.log("message:",message)
             request.postRquest(
                 [
                     '/sysdepartment/del/'+message.id,
@@ -197,10 +229,10 @@ export default {
     },
     created() {
         this.getInfo()
+        this.getArea()
     },
     components: {
-        cjTableTreeButton,
-        cjHandleButton
+        cjRightButton
     },
 }
 </script>

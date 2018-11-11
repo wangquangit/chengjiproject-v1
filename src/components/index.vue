@@ -1,40 +1,43 @@
 <template>
-    <el-container :style="'height:'+winHeight">
-        <el-menu
-            class="el-menu-vertical-demo leftmenu" 
-            :collapse="isCollapse"
-        >
-            <h3 class="logo">
-                <router-link to="/">
-                    <span>
-                        logo
-                    </span>
-                </router-link>
-            </h3>
-            <h3 v-if="loading">
-                加载中...
-            </h3>
-            <el-submenu 
-                :index="String(menuindex)"
-                v-for="(menu, menuindex) in userMenuInfo"
-                :key="menuindex"
+    <el-container style="height: 706px">
+        <el-aside>
+            <el-menu
+                style="height: 706px"
+                class="el-menu-vertical-demo leftmenu" 
+                :collapse="isCollapse"
+                v-loading="loading"
             >
-                <template slot="title">
-                    <i class="el-icon-location"></i>
-                    <span>{{menu.name}}</span>
-                </template>
-                <el-menu-item-group>
-                    <el-menu-item
-                        v-for="(item, itemindex) in menu.children"
-                        :key="itemindex"
-                        :index="String(menuindex+'-'+itemindex)"
-                        @click="gotourl(item.listButton,item.url)"
+                <h3 class="logo">
+                    <router-link to="/">
+                        <span>
+                            logo
+                        </span>
+                    </router-link>
+                </h3>
+                <el-submenu 
+                    :index="String(menuindex)"
+                    v-for="(menu, menuindex) in userMenuInfo"
+                    :key="menuindex"
+                >
+                    <template slot="title">
+                        <i class="el-icon-location"></i>
+                        <span>{{menu.name}}</span>
+                    </template>
+                    <el-menu-item-group
+                        class="leftmenu"
                     >
-                        {{item.name}}
-                    </el-menu-item>
-                </el-menu-item-group>
-            </el-submenu>
-        </el-menu>
+                        <el-menu-item
+                            v-for="(item, itemindex) in menu.children"
+                            :key="itemindex"
+                            :index="String(menuindex+'-'+itemindex)"
+                            @click="gotourl(item.listButton,item.url)"
+                        >
+                            {{item.name}}
+                        </el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
 
         <el-container>
             <el-header>
@@ -149,5 +152,8 @@
   .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 300px;
     min-height: 706px;
+  }
+  .leftmenu{
+      background: #99a9bf;
   }
 </style>

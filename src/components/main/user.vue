@@ -87,7 +87,6 @@ export default {
                 isAsc: this.sort.isAsc,
                 where: this.where,
             }
-            console.log('params:',params)
             this.loading = true
             request.postRquest(
                 [
@@ -103,7 +102,6 @@ export default {
                             if(res.data.records.length == 0){
                                 // 当请求的数据长度为0时,修改请求参数再重新请求
                                 if(res.data.current > 1){
-                                    console.log('a')
                                     this.page.currentPage = res.data.current - 1
                                     this.getInfo()
                                 } else {
@@ -128,7 +126,6 @@ export default {
             this.getInfo()
         },
         currentChange(value) {
-            console.log('page:',value)
             this.page.currentPage = value
             this.getInfo()
         },
@@ -144,6 +141,12 @@ export default {
                     'post',
                     params,
                     (res) => {
+                        if(res.data.code == 11) {
+                            this.$message({
+                                message: res.data.msg,
+                                type: 'success'
+                            })
+                        }
                         this.getInfo()
                         this.emptyForms()
                     },
@@ -177,7 +180,7 @@ export default {
                     'put',
                     params,
                     (res) => {
-                        this.$message({message:'修改成功', type: 'success'})
+                        this.$message({message: res.data.msg, type: 'success'})
                         this.getInfo()
                         this.emptyForms()
                     },
