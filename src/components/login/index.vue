@@ -164,7 +164,6 @@ li{
   margin-top: 2px;
   width: 100px;
   height: 38px;
-  background-color: #fdfdfd;
   border: 1px solid #f0f0f0;
   color: #333;
   font-size: 14px;

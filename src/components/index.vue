@@ -1,9 +1,8 @@
 <template>
-    <el-container style="height: 706px">
-        <el-aside>
+    <el-container class="boos" :style="'height:'+winHeight">
+        <el-scrollbar class="el-scrollbar__wrap">
             <el-menu
-                style="height: 706px"
-                class="el-menu-vertical-demo leftmenu" 
+                class="el-menu-vertical-demo" 
                 :collapse="isCollapse"
                 v-loading="loading"
             >
@@ -23,9 +22,7 @@
                         <i class="el-icon-location"></i>
                         <span>{{menu.name}}</span>
                     </template>
-                    <el-menu-item-group
-                        class="leftmenu"
-                    >
+                    <el-menu-item-group>
                         <el-menu-item
                             v-for="(item, itemindex) in menu.children"
                             :key="itemindex"
@@ -37,24 +34,24 @@
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
-        </el-aside>
+        </el-scrollbar>
 
-        <el-container>
+        <el-container class="rightMain">
             <el-header>
                 <el-button @click="changewidth">click me</el-button>
             </el-header>
-            <el-row>
-                <el-col :span="24">
-                    <div class="grid-content bg-purple-dark">
-                        <cj-tags></cj-tags>
-                    </div>
-                </el-col>
-            </el-row>
-            <el-main>
+            <el-scrollbar style="height:100%" class="el-scrollbar__wrap">
+                <el-row>
+                    <el-col :span="24">
+                        <div class="grid-content bg-purple-dark">
+                            <cj-tags></cj-tags>
+                        </div>
+                    </el-col>
+                </el-row>
                 <keep-alive>
                     <router-view></router-view>
                 </keep-alive>
-            </el-main>
+            </el-scrollbar>
 
         </el-container>
 
@@ -121,39 +118,21 @@
 </script>
 
 <style scoped>
-  .el-col {
-    border-radius: 4px;
-  }
-  .bg-purple-dark {
-    background: #99a9bf;
-  }
-  .bg-purple {
-    background: #d3dce6;
-  }
-  .bg-purple-light {
-    background: #e5e9f2;
-  }
-  .grid-content {
-    border-radius: 4px;
+.grid-content {
     min-height: 36px;
-  }
-  .header{
-      background: #eee
-  }
-  .main{
-      background: #ccc
-  }
-  .indexright{
-      float: right;
-  }
-  .logo{
+}
+.logo{
       margin: 1rem 0;
-  }
-  .el-menu-vertical-demo:not(.el-menu--collapse) {
-    width: 300px;
-    min-height: 706px;
-  }
-  .leftmenu{
-      background: #99a9bf;
-  }
+}
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 250px;
+    min-height: 700px;
+}
+.el-scrollbar__wrap {
+    height:100%;
+    overflow-x: hidden;
+}
+el-container{
+    border: none;
+}
 </style>

@@ -10,6 +10,7 @@
   "dependencies": {
     "@smallwei/avue": "^1.2.7",
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "node-sass": "^4.10.0",
     "qs": "^6.5.2",
     "sass": "^1.14.3",
