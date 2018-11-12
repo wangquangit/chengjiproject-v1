@@ -35,7 +35,6 @@
 <script>
 import request from '../user_authority.js'
 import cjRightButton from '../shareComponents/cjrightbutton.vue'
-import config from '../config.js';
 export default {
     data() {
         return {
@@ -72,11 +71,14 @@ export default {
                 forms: [
                     {label: 'area_name', name: '区域名称', value: ''},
                     {label: 'area_code', name: '区域编号', value: ''},
-                    {label: 'area_leavel', name: '区域等级', value: ''},
+                    // {label: 'area_leavel', name: '区域等级', value: ''},
                 ],
                 getAreaCommon: [],
                 title: '区域'
             },
+            zoomButtonname: '收起',
+            zoomButtonicon: 'el-icon-caret-top',
+            zoomButton: true
         }
     },
     methods:{
@@ -137,14 +139,13 @@ export default {
                 params = {
                     area_name: info.forms[0].value,
                     area_code: info.forms[1].value,
-                    area_leavel: info.forms[2].value,
+                    area_leavel: message.area_leavel,
                     parent_id: message.id
                 }
             } else {
                 params = {
                     area_name: info.forms[0].value,
                     area_code: info.forms[1].value,
-                    area_leavel: info.forms[2].value,
                 }
             }
             request.postRquest(
@@ -208,13 +209,21 @@ export default {
                     'delete',
                     {},
                     (res) => {
-                        this.$message({
-                            message: res.data.msg
-                        })
+                        if(res.data.code == 11) {
+                            this.$message({
+                                message: res.data.msg,
+                                type: 'success'
+                            })
+                        } else {
+                            this.$message({
+                                message: res.data.msg
+                            })
+                        }
+                        this.getInfo()
                     }
                 ]
             )
-        }
+        },
     },
     created() {
         this.getInfo()
@@ -235,5 +244,8 @@ export default {
 }
 .main{
     padding: .5rem;
+}
+.two-button{
+    margin-left: 1rem;
 }
 </style>

@@ -29,8 +29,8 @@
             </div>
         </el-dialog>
 
-        <el-dialog title="选择区域" :visible.sync="selectArea">
-            <el-tree 
+        <el-dialog :title="'选择区域 '+filterText" :visible.sync="selectArea">
+            <el-tree
                 :data="info.getAreaCommon" 
                 :props="defaultProps"
                 @node-click="handleNodeClick"
@@ -71,6 +71,7 @@ export default {
         handleNodeClick(value) {
             // 选择区域后复制
             this.area = value
+            this.filterText = value.name
         },
         focus(item) {
             if(item.select) {
@@ -98,8 +99,8 @@ export default {
             this.addAreaWindow = true
         },
         del() {
-            console.log(this.message)
-            this.$confirm('确定要删除  '+this.message.department_name+'  ?', '提示', {
+            console.log('message:',this.message)
+            this.$confirm('确定要删除  ?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'

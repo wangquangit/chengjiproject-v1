@@ -20,7 +20,28 @@
                         :label-width="formLabelWidth"
                         v-if="item.label != 'id'"
                     >
-                        <el-input v-model="item.value"></el-input>
+                        <el-input v-if="!item.select && !item.file" v-model="item.value"></el-input>
+
+                        <input 
+                            @change="changeFile($event)" 
+                            v-if="item.file" 
+                            type="file" 
+                            accept="image/*"
+                            class="btn btn-default"
+                        />
+                        <!-- 文件上传 -->
+
+                        <el-select @change="handleSelect" v-if="item.select" v-model="selectValue" placeholder="请选择">
+                            <!--  下拉选择 -->
+                            <el-option 
+                                v-for="(item, index) of item.selectArr"
+                                :key="index"
+                                :label="item.label"
+                                :value="item.value"
+                            >
+                            </el-option>
+                        </el-select>
+
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -30,6 +51,7 @@
             </el-dialog>
 
             <el-dialog @close="restore" :title="'修改-'+title" :visible.sync="editTableVisible">
+                <!-- 修改表单 -->
                 <el-form>
                     <el-form-item
                         v-for="(item, index) of data.forms"
@@ -38,7 +60,28 @@
                         :label-width="formLabelWidth"
                         v-if="item.label != 'id'"
                     >
-                        <el-input v-model="item.value"></el-input>
+                        <el-input v-if="!item.file && !item.select" v-model="item.value"></el-input>
+
+                        <!-- 文件上传 -->
+                        <input 
+                            @change="changeFile($event)" 
+                            v-if="item.file" 
+                            type="file" 
+                            accept="image/*"
+                            class="btn btn-default"
+                        />
+
+                        <el-select @change="handleSelect" v-if="item.select" v-model="selectValue" placeholder="请选择">
+                            <!--  下拉选择 -->
+                            <el-option 
+                                v-for="(item, index) of item.selectArr"
+                                :key="index"
+                                :label="item.label"
+                                :value="item.value"
+                            >
+                            </el-option>
+                        </el-select>
+
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -69,10 +112,12 @@
                     <el-form-item
                         v-for="(item, index) of data.forms"
                         :key="index"
-                        :label="item.label"
-                        :label-width="formLabelWidth"
+                        :label="item.label+':'"
+                        :label-width="showLabelWidth"
                     >
-                        <el-input :disabled="true" v-model="item.value"></el-input>
+                        <div style="float: left;">
+                            {{item.value}}
+                        </div>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -95,7 +140,12 @@ export default {
             searchTableVisible: false,
             showVisible: false,
             formLabelWidth: '120px',
-            title: ''
+            showLabelWidth: '250px',
+            title: '',
+            selectionArr: [],
+            selectValue: '',
+            file: '',
+            src: ''
         }
     },
     props: {
@@ -194,6 +244,22 @@ export default {
         },
         restore() {
             this.$emit('restore')
+        },
+        handleSelect(value) {
+            // 选择下拉列表后赋值
+            for(var i of this.data.forms) {
+                if(i.select) {
+                    i.value = value
+                }
+            }
+        },
+        changeFile(event) {
+            // 文件上传
+            for(var i of this.data.forms) {
+                if(i.file) {
+                    i.value = event.target.files[0]
+                }
+            }
         }
     },
 }

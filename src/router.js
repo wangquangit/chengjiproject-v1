@@ -50,6 +50,12 @@ const router = new Router({
           path: 'sysarea',
           name: 'sysarea',
           component: () => import('./components/main/sysarea.vue')
+        },
+        {
+          // 单位
+          path: 'sysuniits',
+          name: 'sysuniits',
+          component: () => import('./components/main/sysuniits.vue')
         }
       ]
     },

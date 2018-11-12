@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div v-loading="loading" class="main">
         <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24">
                 <div class="grid-content bg-purple">
@@ -242,5 +242,9 @@ export default {
     border-radius: 4px;
     min-height: 36px;
     float: left;
+    margin: 1rem 0;
+}
+.main{
+    padding: .5rem;
 }
 </style>

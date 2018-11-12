@@ -19,7 +19,6 @@ function GetToken(listener, ps) {
                 password: window.sessionStorage.getItem('password')
             },
         ).then((res) => {
-            console.log('请求')
             if (res.data.code > 0) {
                 var token = res.data.data['token'] // 获取token
                 sessionStorage.setItem('token', token) // 设置保存到本地token
@@ -58,6 +57,7 @@ export default{
             requestParams
         ).then((res) => {
             // eslint-disable-next-line no-console
+            // console.log(res)
             if (res.data.code == -12){
                 //token超时
                 GetToken(netHelper, args)

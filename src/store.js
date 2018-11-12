@@ -13,8 +13,17 @@ export default new Vuex.Store({
     nowButtons: [],
     selectionArr: [],
     mainButtonInfo: {},
+    isCollapse: false,
+    leftMenuWidth: 265,
+    lefuMenuIcon: 'el-icon-d-arrow-left',
+    logoStyle: 'logo'
   },
   mutations: {
+    SET_LEFT_MENU: (state) => {
+      state.isCollapse = !state.isCollapse
+      state.leftMenuWidth = state.isCollapse ? 64 : 265
+      state.lefuMenuIcon = !state.isCollapse ? 'el-icon-d-arrow-left' : 'el-icon-d-arrow-right'
+    }
   },
   actions: {
 

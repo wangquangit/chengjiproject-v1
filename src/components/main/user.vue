@@ -14,7 +14,7 @@
             <cj-main-top-button
                 :buttonList="buttonList"
                 :data="userInfo"
-                @addSubmit="addInfo"
+                @addSubmit="addSubmit"
                 @editInfo="editInfo"
                 @editSubmit="editSubmit"
                 @deleteForm="deleteForm"
@@ -40,10 +40,10 @@ export default {
                     {label: '手机号', prop: 'phone', value: ''},
                     {label: '密码', prop: 'password', value: ''},
                 ],
-                selectionArr: [],
+                selectionArr: [], // 选中列表项
                 formTitle: {
-                    idFiled: 'id',
-                    titleFiled: 'loginname'
+                    // idFiled: 'id',
+                    titleFiled: 'loginname' // 修改弹出层的title
                 }
             },
             buttonList: [],
@@ -133,8 +133,9 @@ export default {
             // 数据刷新
             this.getInfo()
         },
-        addInfo(value) {
-            var params = config.formJson(value);
+        addSubmit(forms) {
+            var params = config.formJson(forms);
+            console.log(params)
             request.postRquest(
                 [
                     '/user/addInfo',
@@ -195,10 +196,11 @@ export default {
                     'delete',
                     {},
                     (res) => {
+                        console.log(res)
                         this.getInfo()
                         this.$message(
                             {
-                                message: '删除成功',
+                                message: res.data.msg,
                                 type: 'success'
                             }
                         )

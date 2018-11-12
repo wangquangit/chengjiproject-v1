@@ -1,12 +1,13 @@
 <template>
     <el-container class="boos" :style="'height:'+winHeight">
-        <el-scrollbar class="el-scrollbar__wrap">
+        <!-- <el-scrollbar class="el-scrollbar__wrap"> -->
+        <el-aside class="menu" :width="this.$store.state.leftMenuWidth+'px'" :style="'height:'+winHeight">
             <el-menu
-                class="el-menu-vertical-demo" 
-                :collapse="isCollapse"
+                class="el-menu-vertical-demo"
+                :collapse="this.$store.state.isCollapse"
                 v-loading="loading"
             >
-                <h3 class="logo">
+                <h3 :class="this.$store.state.logoStyle">
                     <router-link to="/">
                         <span>
                             logo
@@ -34,24 +35,48 @@
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
-        </el-scrollbar>
+        <!-- </el-scrollbar> -->
+        </el-aside>
 
         <el-container class="rightMain">
-            <el-header>
-                <el-button @click="changewidth">click me</el-button>
-            </el-header>
-            <el-scrollbar style="height:100%" class="el-scrollbar__wrap">
+            <el-header style="height: 80px">
                 <el-row>
                     <el-col :span="24">
+                        <div class="grid-content bg-purple-dark">
+                            <cj-tops 
+                            ></cj-tops>
+                        </div>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="22">
                         <div class="grid-content bg-purple-dark">
                             <cj-tags></cj-tags>
                         </div>
                     </el-col>
+                    <el-col :span="2">
+                        <div class="grid-content bg-purple-dark">
+                            <el-dropdown>
+                            <el-button type="primary" size="mini" style="margin-top:3px">
+                                更多<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>关闭全部</el-dropdown-item>
+                                <el-dropdown-item>关闭其他</el-dropdown-item>
+                            </el-dropdown-menu>
+                            </el-dropdown>
+                        </div>
+                    </el-col>
                 </el-row>
+            </el-header>
+
+            <!-- <el-scrollbar style="height:100%" class="el-scrollbar__wrap"> -->
+            <el-main class="main">
                 <keep-alive>
                     <router-view></router-view>
                 </keep-alive>
-            </el-scrollbar>
+            <!-- </el-scrollbar> -->
+            </el-main>
 
         </el-container>
 
@@ -59,70 +84,76 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex';
-    import config from './config.js'
-    import request from './user_authority.js'
-    import cjTags from './shareComponents/cjtags.vue'
-    export default{
-        data() {
-            return {
-                msg: 'this is index views',
-                isCollapse: false,
-                winHeight: window.innerHeight+'px', // 获取窗口高度
-                manubuttonicon: 'el-icon-d-arrow-left',
-                loading: true, // 左侧菜单栏加载状态
-            }
-        },
-        methods: {
-            gotourl(listButtons,url) {
-                this.$router.push(url)
-            },
-            getUserMenuInfo() {
-                request.postRquest(
-                    [
-                        '/login/getUserPermission',
-                        'post',
-                        {},
-                        (response) => {
-                            this.$store.state.userMenuInfo = response.data
-                            this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
-                            this.loading = false // 加载状态消失
-                        },
-                        false
-                    ]
-                )
-            },
-            setMainButtons(response) {
-                // 将按钮对象组织后添加到全局
-                for(var index in response){
-                    for(var item in response[index].children) {
-                        this.$store.state.mainButtonInfo[response[index].children[item].url]
-                            = response[index].children[item].listButton
-                    }
-                }
-            },
-            changewidth() {
-                this.isCollapse = !this.isCollapse
-            }
-        },
-        computed: {
-            ...mapState(['manuwidth','mainwidth','userMenuInfo'])
-        },
-        created() {
-            this.getUserMenuInfo()
-        },
-        components: {
-            cjTags
+import { mapState } from 'vuex';
+import config from './config.js'
+import request from './user_authority.js'
+import cjTags from './shareComponents/cjtags.vue'
+import cjTops from './shareComponents/cjtops.vue'
+export default{
+    data() {
+        return {
+            msg: 'this is index views',
+            winHeight: window.innerHeight+'px', // 获取窗口高度
+            manubuttonicon: 'el-icon-d-arrow-left',
+            loading: true, // 左侧菜单栏加载状态
+            setLefuButton: 'el-icon-d-arrow-left',
+            logos: 'logo'
         }
+    },
+    methods: {
+        gotourl(listButtons,url) {
+            this.$router.push(url)
+        },
+        getUserMenuInfo() {
+            request.postRquest(
+                [
+                    '/login/getUserPermission',
+                    'post',
+                    {},
+                    (response) => {
+                        this.$store.state.userMenuInfo = response.data
+                        this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
+                        this.loading = false // 加载状态消失
+                    },
+                    false
+                ]
+            )
+        },
+        setMainButtons(response) {
+            // 将按钮对象组织后添加到全局
+            for(var index in response){
+                for(var item in response[index].children) {
+                    this.$store.state.mainButtonInfo[response[index].children[item].url]
+                        = response[index].children[item].listButton
+                }
+            }
+        },
+    },
+    computed: {
+        ...mapState(['manuwidth','mainwidth','userMenuInfo'])
+    },
+    created() {
+        this.getUserMenuInfo()
+    },
+    components: {
+        cjTags,
+        cjTops
     }
+}
 </script>
 
 <style scoped>
 .grid-content {
+    border-radius: 4px;
     min-height: 36px;
 }
+.bg-purple-dark {
+    background: #99a9bf;
+    overflow: hidden;
+  }
 .logo{
-      margin: 1rem 0;
+      margin: 1rem;
+      /* position: absolute; */
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 250px;
@@ -132,7 +163,14 @@
     height:100%;
     overflow-x: hidden;
 }
-el-container{
-    border: none;
+
+.menu > .el-menu-vertical-demo{
+    /* background: rgb(32, 34, 42); */
+}
+.tags{
+    padding: 1rem;
+}
+.main{
+    padding-top: 0;
 }
 </style>
