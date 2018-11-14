@@ -35,14 +35,15 @@ const router = new Router({
           component: () => import('./components/main/role.vue')
         },
         {
+          // 用户
           path: 'user',
           name: 'user',
           component: () => import('./components/main/user.vue')
         },
         {
           // 部门
-          path: 'department',
-          name: 'department',
+          path: 'sysdepartment',
+          name: 'sysdepartment',
           component: () => import('./components/main/sysdepartment.vue')
         },
         {
@@ -56,6 +57,18 @@ const router = new Router({
           path: 'sysuniits',
           name: 'sysuniits',
           component: () => import('./components/main/sysuniits.vue')
+        },
+        {
+          //角色
+          path: 'rmsrole',
+          name: 'rmsrole',
+          component: () => import('./components/main/rmsrole.vue')
+        },
+        {
+          // 车型
+          path: 'cartype',
+          name: 'cartype',
+          component: () => import('./components/main/cartype.vue')
         }
       ]
     },

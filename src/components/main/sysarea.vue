@@ -35,6 +35,7 @@
 <script>
 import request from '../user_authority.js'
 import cjRightButton from '../shareComponents/cjrightbutton.vue'
+import config from '../config.js'
 export default {
     data() {
         return {
@@ -174,12 +175,12 @@ export default {
                     (res) => {
                         this.info.forms[0].value = res.data.data.area_name
                         this.info.forms[1].value = res.data.data.area_code
-                        this.info.forms[2].value = res.data.data.area_leavel
                     }
                 ]
             )
         },
         editSubmit(info, message) {
+            console.log("info:",info)
             request.postRquest(
                 [
                     '/sysarea/editInfo',
@@ -189,7 +190,6 @@ export default {
                         parent_id: message.parent_id,
                         area_name: info.forms[0].value,
                         area_code: info.forms[1].value,
-                        area_leavel: info.forms[2].value,
                     },
                     (res) => {
                         this.$message({

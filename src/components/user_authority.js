@@ -43,6 +43,7 @@ export default{
         var param = args[2];//请求参数
         var listener = args[3];//监听函数
         var or = args[4]; // 判断是否为添加,添加必须为params参数名
+        var type = args[5]
         // 请求数据
         var requestParams = or == false ? {
             method: methods,
@@ -52,6 +53,7 @@ export default{
             method: methods,
             url: config.serverurl + apiurl,
             data: param,
+            responseType: type
         }
         axios(
             requestParams

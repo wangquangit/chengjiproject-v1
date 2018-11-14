@@ -44,7 +44,12 @@ export default {
                 formTitle: {
                     // idFiled: 'id',
                     titleFiled: 'loginname' // 修改弹出层的title
-                }
+                },
+                permitSubmit: true,
+                searchWindowForm: [
+                    {label: '用户名', prop: 'loginname', value: ''},
+                    {label: '手机号', prop: 'phone', value: ''},
+                ]
             },
             buttonList: [],
             data: [],

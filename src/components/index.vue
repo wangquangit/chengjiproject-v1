@@ -111,8 +111,11 @@ export default{
                     'post',
                     {},
                     (response) => {
-                        this.$store.state.userMenuInfo = response.data
-                        this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
+                        console.log("response:",response)
+                        if(response.data.code > 0) {
+                            this.$store.state.userMenuInfo = response.data
+                            this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
+                        }
                         this.loading = false // 加载状态消失
                     },
                     false
