@@ -14,14 +14,14 @@ export default new Vuex.Store({
     selectionArr: [],
     mainButtonInfo: {},
     isCollapse: false,
-    leftMenuWidth: 265,
+    leftMenuWidth: 120,
     lefuMenuIcon: 'el-icon-d-arrow-left',
     logoStyle: 'logo'
   },
   mutations: {
     SET_LEFT_MENU: (state) => {
       state.isCollapse = !state.isCollapse
-      state.leftMenuWidth = state.isCollapse ? 64 : 265
+      state.leftMenuWidth = state.isCollapse ? 64 : 120
       state.lefuMenuIcon = !state.isCollapse ? 'el-icon-d-arrow-left' : 'el-icon-d-arrow-right'
     }
   },

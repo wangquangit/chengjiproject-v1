@@ -13,7 +13,7 @@
             </el-col>
         </el-row>
         <avue-tree-table :option="option">
-            <el-table-column label="操作" width="270px">
+            <el-table-column label="操作" width="275px">
                 <template slot-scope="scope">
                     <!-- 右侧按钮 -->
                     <cj-right-button
@@ -180,7 +180,6 @@ export default {
             )
         },
         editSubmit(info, message) {
-            console.log("info:",info)
             request.postRquest(
                 [
                     '/sysarea/editInfo',

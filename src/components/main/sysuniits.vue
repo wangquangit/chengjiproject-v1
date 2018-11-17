@@ -104,7 +104,6 @@ export default {
                         'post',
                         params,
                         (res) => {
-                            console.log("res:",res)
                             this.loading = false
                             this.data = res.data.records
                             this.page.total = res.data.total
@@ -258,7 +257,6 @@ export default {
         },
         submitSearch(forms) {
             // 修改搜索表单
-            console.log(forms)
             let searchForm = [
                 {
                     name: 'units_name',
@@ -295,7 +293,6 @@ export default {
                 this.sort.isAsc = true :
                 this.sort.isAsc = false
             this.getInfo()
-            // console.log('当前排序:',this.sort)
         },
     },
     created() {

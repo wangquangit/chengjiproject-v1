@@ -30,6 +30,11 @@ const router = new Router({
           component: () => import('./components/main/dictype.vue')
         },
         {
+          path: 'manu',
+          name: 'manu',
+          component: () => import('./components/main/manu.vue')
+        },
+        {
           path: 'role',
           name: 'role',
           component: () => import('./components/main/role.vue')

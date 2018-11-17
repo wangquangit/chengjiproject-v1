@@ -1,17 +1,18 @@
 <template>
     <el-container class="boos" :style="'height:'+winHeight">
-        <!-- <el-scrollbar class="el-scrollbar__wrap"> -->
-        <el-aside class="menu" :width="this.$store.state.leftMenuWidth+'px'" :style="'height:'+winHeight">
+        <el-scrollbar style="height:100%">
+        <!-- <el-aside class="menu" :width="this.$store.state.leftMenuWidth+'px'" :style="'height:'+winHeight"> -->
             <el-menu
                 class="el-menu-vertical-demo"
                 :collapse="this.$store.state.isCollapse"
                 v-loading="loading"
             >
+                            <!-- :style="'width:'+this.$store.state.leftMenuWidth+'px'" -->
                 <h3 :class="this.$store.state.logoStyle">
                     <router-link to="/">
-                        <span>
-                            logo
-                        </span>
+                        <h4>
+                            versions -1
+                        </h4>
                     </router-link>
                 </h3>
                 <el-submenu 
@@ -20,7 +21,7 @@
                     :key="menuindex"
                 >
                     <template slot="title">
-                        <i class="el-icon-location"></i>
+                        <i :class="'iconfont '+menu.iconCls"></i>
                         <span>{{menu.name}}</span>
                     </template>
                     <el-menu-item-group>
@@ -35,48 +36,44 @@
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
-        <!-- </el-scrollbar> -->
-        </el-aside>
+        </el-scrollbar>
+        <!-- </el-aside> -->
 
         <el-container class="rightMain">
             <el-header style="height: 80px">
                 <el-row>
                     <el-col :span="24">
-                        <div class="grid-content bg-purple-dark">
+                        <div class="tops">
                             <cj-tops 
                             ></cj-tops>
                         </div>
                     </el-col>
                 </el-row>
-                <el-row>
-                    <el-col :span="22">
-                        <div class="grid-content bg-purple-dark">
-                            <cj-tags></cj-tags>
-                        </div>
-                    </el-col>
-                    <el-col :span="2">
-                        <div class="grid-content bg-purple-dark">
-                            <el-dropdown>
-                            <el-button type="primary" size="mini" style="margin-top:3px">
-                                更多<i class="el-icon-arrow-down el-icon--right"></i>
-                            </el-button>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>关闭全部</el-dropdown-item>
-                                <el-dropdown-item>关闭其他</el-dropdown-item>
-                            </el-dropdown-menu>
-                            </el-dropdown>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div class="tagsMain">
+                    <div class="tagsLeft">
+                        <cj-tags></cj-tags>
+                    </div>
+                    <div class="tagsRigth">
+                        <el-dropdown>
+                        <el-button type="primary" size="mini" style="margin-top:3px">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </el-button>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item>关闭全部</el-dropdown-item>
+                            <el-dropdown-item>关闭其他</el-dropdown-item>
+                        </el-dropdown-menu>
+                        </el-dropdown>
+                    </div>
+                </div>
             </el-header>
 
-            <!-- <el-scrollbar style="height:100%" class="el-scrollbar__wrap"> -->
-            <el-main class="main">
+            <el-scrollbar style="height:100%">
+            <!-- <el-main class="main"> -->
                 <keep-alive>
                     <router-view></router-view>
                 </keep-alive>
-            <!-- </el-scrollbar> -->
-            </el-main>
+            </el-scrollbar>
+            <!-- </el-main> -->
 
         </el-container>
 
@@ -111,11 +108,14 @@ export default{
                     'post',
                     {},
                     (response) => {
-                        console.log("response:",response)
-                        if(response.data.code > 0) {
-                            this.$store.state.userMenuInfo = response.data
-                            this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
+                        if(response.data.code == -66){
+                            this.$message({
+                                message: res.data.msg
+                            })
+                            return
                         }
+                        this.$store.state.userMenuInfo = response.data
+                        this.setMainButtons(response.data) // 获取按钮后添加到全局 // ???
                         this.loading = false // 加载状态消失
                     },
                     false
@@ -175,5 +175,17 @@ export default{
 }
 .main{
     padding-top: 0;
+}
+.tagsRigth{
+    float: right;
+}
+.tagsLeft{
+    float: left;
+}
+.tagsMain{
+    margin-top: 10px;
+}
+.tops{
+    margin-top: 5px;
 }
 </style>

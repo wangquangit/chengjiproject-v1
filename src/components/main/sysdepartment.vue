@@ -14,7 +14,7 @@
         </el-row>
 
         <avue-tree-table :option="option">
-            <el-table-column label="操作" width="270px">
+            <el-table-column label="操作" width="275px">
                 <template slot-scope="scope">
                     <cj-right-button
                         :buttonList="buttonList"
@@ -195,7 +195,6 @@ export default {
                         department_code: department_code,
                     },
                     (res) => {
-                        console.log("res:",res)
                         this.getInfo()
                     },
                     false
@@ -203,7 +202,6 @@ export default {
             )
         },
         delSubmit(message) {
-            console.log("message:",message)
             request.postRquest(
                 [
                     '/sysdepartment/del/'+message.id,

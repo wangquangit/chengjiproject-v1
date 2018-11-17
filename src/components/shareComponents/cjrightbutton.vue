@@ -99,7 +99,6 @@ export default {
             this.addAreaWindow = true
         },
         del() {
-            console.log('message:',this.message)
             this.$confirm('确定要删除  ?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -107,7 +106,7 @@ export default {
             }).then(() => {
                 this.$emit('delSubmit', this.message)
             }).catch(() => {
-                console.log("取消")
+
             });
         },
         closeWindow() {

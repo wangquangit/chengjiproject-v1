@@ -5,6 +5,9 @@
         :table-loading="loading"
         :page="page"
         @selection-change="selectionChange"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+        @refresh-change="getInfo"
     >
         <!-- <template slot-scope="scope" slot="menu">
             右侧按钮
@@ -94,6 +97,7 @@ export default {
     },
     methods: {
         getInfo() {
+            this.loading = true
             this.getButton()
             if(this.buttonList) {
                 request.postRquest(
@@ -102,14 +106,20 @@ export default {
                         'post',
                         config.setParams(this.params,this.page),
                         (res) => {
-                            console.log("res:",res)
                             this.data = res.data.records
-                            if(config.setPage(res)){
-                                this.page = config.setPage(res)
-                            } else {
-                                this.getInfo()
-                            }
                             this.loading = false
+                            this.page.total = res.data.total
+                            if(res.data.records.length == 0){
+                                // 当请求的数据长度为0时,修改请求参数再重新请求
+                                if(res.data.current > 1){
+                                    this.page.currentPage = res.data.current - 1
+                                    this.getInfo()
+                                } else {
+                                    this.page.currentPage = res.data.current
+                                }
+                            } else {
+                                this.page.currentPage = res.data.current
+                            }
                         }
                     ]
                 )
@@ -148,7 +158,18 @@ export default {
             )
         },
         selectionChange(value) {
+            // 多选
             this.userInfo.selectionArr = value
+        },
+        sizeChange(value) {
+            // 设置每页大小
+            this.page.pageSize = value
+            this.getInfo()
+        },
+        currentChange(value) {
+            // 设置页码
+            this.page.currentPage = value
+            this.getInfo()
         },
         editInfo() {
             if(this.userInfo.selectionArr.length > 0) {
@@ -208,6 +229,7 @@ export default {
             )
         },
         getPermission() {
+            // 获取权限
             request.postRquest(
                 [
                     '/rmsrolesss/getPermissions',
@@ -223,7 +245,23 @@ export default {
             )
         },
         submitAddPermission(value) {
-            console.log('接收到子组件传来的数组!!', value)
+            let PermissionArrStr = value.join(',')
+            request.postRquest(
+                [
+                    '/rmsrolesss/editPermissions',
+                    'put',
+                    {
+                        idSet: PermissionArrStr,
+                        roleId: this.userInfo.selectionArr[0].id
+                    },
+                    (res) => {
+                        res.data.code == 11 ?
+                            this.$message({message: res.data.msg, type: 'success'}) :
+                            this.$message({message: res.data.msg})
+                    },
+                    false
+                ]
+            )
         }
     },
     created() {

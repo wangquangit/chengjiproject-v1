@@ -59,7 +59,7 @@ export default{
             requestParams
         ).then((res) => {
             // eslint-disable-next-line no-console
-            // console.log(res)
+            // console.log('请求的响应:',res)
             if (res.data.code == -12){
                 //token超时
                 GetToken(netHelper, args)
@@ -68,7 +68,7 @@ export default{
                 listener(res);
             }
         }).catch((error) => {
-            alert(error)
+            alert('请求错误:',error)
         })
     },
 }

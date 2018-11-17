@@ -8,6 +8,55 @@
             class="setmenu"
             @click="setMenu"
         ></el-button>
+
+        <el-button 
+            circle 
+            size="small"
+            class="setmenu"
+            icon="el-icon-menu"
+            @click="setMenu"
+        ></el-button>
+
+        <el-button 
+            circle
+            size="small"
+            class="setmenu"
+            icon="el-icon-setting"
+            @click="setMenu"
+        ></el-button>
+
+        <el-button
+            circle
+            size="small"
+            icon="el-icon-message"
+            class="rigthMenu"
+        >
+        </el-button>
+
+        <el-button
+            circle
+            size="small"
+            icon="el-icon-news"
+            class="rigthMenu"
+        >
+        </el-button>
+        
+        <el-button
+            circle
+            size="small"
+            icon="el-icon-tickets"
+            class="rigthMenu"
+        >
+        </el-button>
+
+        <el-button
+            circle
+            size="small"
+            icon="el-icon-sort"
+            class="rigthMenu"
+        >
+        </el-button>
+
     </div>
 </template>
 
@@ -30,6 +79,10 @@ export default {
 <style lang="scss" scoped>
 .setmenu{
     float: left;
+    margin: 0 1rem;
+}
+.rigthMenu{
+    float: right;
     margin: 0 1rem;
 }
 </style>
