@@ -95,6 +95,7 @@ export default {
                         'post',
                         {},
                         (res) => {
+                            console.log(res)
                             this.option.data = res.data
                             this.loading = false
                         }

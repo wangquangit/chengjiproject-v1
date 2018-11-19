@@ -245,6 +245,7 @@ export default {
             )
         },
         submitAddPermission(value) {
+            console.log("value:",value)
             let PermissionArrStr = value.join(',')
             request.postRquest(
                 [

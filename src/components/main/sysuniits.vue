@@ -21,7 +21,12 @@
                 @export="exports"
                 @checkName="checkName"
                 @submitSearch="submitSearch"
+                @uploadPicture="uploadPicture"
             />
+        </template>
+        <template slot-scope="scope" slot="units_logo">
+                <!-- {{scope.row.units_logo}} -->
+            <img class="logoImg" :src="scope.row.units_logo" alt="">
         </template>
 
     </avue-crud>
@@ -31,6 +36,7 @@
 import request from '../user_authority.js'
 import cjMainTopButton from '../shareComponents/cjmenubutton.vue'
 import config from '../config.js';
+import axios from 'axios';
 export default {
     data() {
         return {
@@ -43,6 +49,7 @@ export default {
                 addBtn: false,
                 stripe: true,
                 column:[
+                    {label: 'logo', prop: 'units_logo', solt:true},
                     {label: '单位名称', prop: 'units_name', sortable:true,},
                     {label: '单位ID', prop: 'id', sortable:true,},
                     {label: '单位信息', prop: 'units_info', sortable:true,},
@@ -57,10 +64,10 @@ export default {
                     // {label: '单位编号', prop: 'units_code', value: ''},
                     {label: '单位描述', prop: 'units_info', value: ''},
                     {label: '考核方式', prop: 'evaluation_mode', value: '', select: true, selectArr: [
-                        {label: '按人考核', value: 0},
-                        {label: '按单位考核', value: 1},
+                        {name: '按人考核', id: 0},
+                        {name: '按单位考核', id: 1},
                     ]},
-                    {label: '单位logo', prop: 'file', value: '', file: true},
+                    {label: '单位logo', prop: 'units_logo', value: '', file: true},
                 ],
                 selectionArr: [],
                 formTitle: {
@@ -70,7 +77,9 @@ export default {
                 searchWindowForm: [
                     {label: '单位名称', prop: 'units_name', value: '', check: null},
                     {label: '单位描述', prop: 'units_info', value: ''},
-                ]
+                ],
+                addPermitSubmit: true,
+                editPermitSubmit: true,
             },
             page: {
                 pageSizes: [10, 20, 30, 40],
@@ -137,6 +146,7 @@ export default {
         addSubmit(forms) {
             // 添加,文件上传
             var params = config.formJson(forms)
+            console.log('params:', params)
             request.postRquest(
                 [
                     '/sysuniits/addInfo',
@@ -191,6 +201,7 @@ export default {
             )
         },
         editSubmit(value) {
+            console.log("value:",value)
             request.postRquest(
                 [
                     '/sysuniits/editInfo',
@@ -200,7 +211,7 @@ export default {
                         units_name: value[0].value,
                         units_info: value[1].value,
                         evaluation_mode: value[2].value,
-                        file: value[3].value,
+                        units_logo: value[3].value,
                     },
                     (res) => {
                         var msgType
@@ -294,6 +305,20 @@ export default {
                 this.sort.isAsc = false
             this.getInfo()
         },
+        uploadPicture(param, config) {
+            // 图片上传
+            axios.post('http://192.168.0.198:8888/sysuniits/fileUpload', param, config).then((res) => {
+                console.log(res)
+                for(var i of this.userInfo.forms){
+                    if(i.prop == 'units_logo') {
+                        // 赋值路径
+                        i.value = res.data.data
+                    }
+                }
+            }).catch((err) => {
+                console.log(err)
+            })
+        },
     },
     created() {
         this.getInfo()
@@ -305,6 +330,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.logoImg{
+    width: 30px;
+    height: 30px;
+}
 </style>
 

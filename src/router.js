@@ -74,6 +74,12 @@ const router = new Router({
           path: 'cartype',
           name: 'cartype',
           component: () => import('./components/main/cartype.vue')
+        },
+        {
+          // 车辆列表
+          path: 'carinfo',
+          name: 'carinfo',
+          component: () => import('./components/main/carinfo.vue')
         }
       ]
     },

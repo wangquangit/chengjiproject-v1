@@ -25,6 +25,7 @@
                     @checkCarName="checkCarName"
                     @checkCarId="checkCarId"
                     @closePermit="closePermit"
+                    @downloadModelFile="downloadModelFile"
                 ></cj-main-top-button>
             </template>
         </avue-crud>
@@ -255,6 +256,7 @@ export default {
             )
         },
         submitImportFile(files) {
+            console.log("files:",files)
             request.postRquest(
                 [
                     '/cartype/import',
@@ -341,6 +343,9 @@ export default {
             for(var i of this.userInfo.forms) {
                 i.prompt = ''
             }
+        },
+        downloadModelFile() {
+            window.open('http://192.168.64.2/cj_project_file/carTypeModelFile.xls')
         }
     },
     created() {

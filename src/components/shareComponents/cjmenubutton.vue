@@ -21,7 +21,9 @@
                         v-if="item.label != 'id'"
                     >
 
-                        <el-input v-if="!item.select && !item.file" @blur="blur(item)" v-model="item.value"/>
+                        <el-input v-if="!item.select && !item.file" @focus="focus(item)" @blur="blur(item)" v-model="item.value"/>
+
+                        <!-- 错误提示 -->
                         <el-alert
                             v-if="item.prompt"
                             :title="item.prompt"
@@ -29,20 +31,23 @@
                             type="error">
                         </el-alert>
 
-                        <span v-if="item.file" class="btn btn-success fileinput-button upButton">
+                        <!-- <input v-if="item.file" class="file" name="file" type="file" accept="image/*" @change="update"/> -->
+
+                        <span v-if="item.file" class="btn btn-info fileinput-button upButton">
                             <span>选择文件</span>
-                            <input accept="image/*" type="file" @change="changeFile($event)" name="file"/>
-                            {{imgFileName}}
+                            <input v-if="item.file" class="file" name="file" type="file" accept="image/*" @change="addImg"/>
+                            <span>
+                                <img class="nowImg" :src="item.value" alt="">
+                            </span>
                         </span>
-                        <!-- 文件上传 -->
 
                         <el-select @change="handleSelect" v-if="item.select" v-model="selectValue" placeholder="请选择">
                             <!--  下拉选择 -->
                             <el-option 
                                 v-for="(item, index) of item.selectArr"
                                 :key="index"
-                                :label="item.label"
-                                :value="item.value"
+                                :label="item.name"
+                                :value="item.id"
                             >
                             </el-option>
                         </el-select>
@@ -75,10 +80,13 @@
                         </el-alert>
 
                         <!-- 文件上传 -->
-                        <span v-if="item.file" class="btn btn-success fileinput-button upButton">
+                        <span v-if="item.file" class="btn btn-info fileinput-button upButton">
                             <span>选择文件</span>
-                            <input accept="image/*" type="file" @change="changeFile($event)" name="file"/>
-                            {{imgFileName}}
+                            <!-- <input accept="image/*" type="file" @change="changeFile($event)" name="file"/> -->
+                            <input v-if="item.file" class="file" name="file" type="file" accept="image/*" @change="upImg"/>
+                            <span>
+                                <img class="nowImg" :src="item.value" alt="">
+                            </span>
                         </span>
 
                         <el-select @change="handleSelect" v-if="item.select" v-model="selectValue" placeholder="请选择">
@@ -147,7 +155,7 @@
                 </div>
             </el-dialog>
 
-            <el-dialog @close="restore" title="权限" :visible.sync="permissionVisible">
+            <!-- <el-dialog @close="restore" title="权限" :visible.sync="permissionVisible">
                 <h1 v-if="!permissionList">加载中...</h1>
                 <el-tree
                     v-if="permissionList"
@@ -159,12 +167,11 @@
                     @check="checkChange"
                 >
                 </el-tree>
-                <!-- {{data.Permissions.nowPermissions}} -->
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="cancel">取消</el-button>
                     <el-button type="primary" @click="submitAddEmit">确定</el-button>
                 </div>
-            </el-dialog>
+            </el-dialog> -->
 
             <el-dialog @close="restore" title="导入" :visible.sync="importVisible">
                 <form action="" id="fileForm">
@@ -178,7 +185,19 @@
                     <el-button @click="cancel">取消</el-button>
                     <el-button type="primary" @click="submitImport">确定</el-button>
                 </div>
+            </el-dialog>
 
+            <el-dialog title="选择区域" :visible.sync="selectAreaVisible">
+                <el-tree
+                    :data="data.getAreaCommon" 
+                    :props="defaultProps"
+                    @node-click="handleNodeClick"
+                ></el-tree>
+
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="closeArea">取消</el-button>
+                    <el-button type="primary" @click="selectAreaVisible = false">确定</el-button>
+                </div>
             </el-dialog>
     </el-col>
 </template>
@@ -197,6 +216,7 @@ export default {
             showVisible: false,
             permissionVisible: false,
             importVisible: false,
+            selectAreaVisible: false,
             permissionList: false, // 权限等待
             nowPermissionList: [], // 拥有的权限列表
             newPermissionObj: {},
@@ -216,6 +236,13 @@ export default {
             fileList:[],
             importFileName: '',
             formdata: {},
+            defaultProps: {
+                children: 'children',
+                label: 'name'
+            },
+            // 区域相关
+            area: {},
+            filterText: '',
         }
     },
     props: {
@@ -225,7 +252,7 @@ export default {
     methods: {
         execute(functionname,data) {
             // BOSS
-            // console.log("functionname:",functionname)
+            console.log("functionname:",functionname)
             this.data = data
             this[functionname]()
         },
@@ -247,7 +274,7 @@ export default {
         },
         addSubmit() {
             // 提交表单传给子组件
-            this.$emit('addSubmit',this.data.forms)
+            this.$emit('addSubmit',this.data.forms, this.area)
             this.addTableVisible = false
         },
         editInfo() {
@@ -323,19 +350,6 @@ export default {
                 }
             }
         },
-        changeFile(event) {
-            if(event) {
-                this.imgFileName = event.target.files[0].name
-            } else {
-                this.imgFileName = ''
-            }
-            // 文件上传
-            for(var i of this.data.forms) {
-                if(i.file) {
-                    i.value = event.target.files[0]
-                }
-            }
-        },
         export() {
             // 导出
             this.$emit('export')
@@ -353,6 +367,31 @@ export default {
                 // 校验车型ID
                 this.$emit('checkCarId', item)
             }
+        },
+        focus(item) {
+            // 选择区域
+            if(item.selectArea) {
+                this.selectAreaVisible = true
+            }
+        },
+        handleNodeClick(value) {
+            // 选择区域后复制
+            this.area = value
+            for(var i of this.data.forms) {
+                if(i.selectArea) {
+                    i.value = value.name
+                }
+            }
+        },
+        closeArea() {
+            // 取消区域的选择
+            this.area = {}
+            for(var i of this.data.forms) {
+                if(i.selectArea) {
+                    i.value = ''
+                }
+            }
+            this.selectAreaVisible = false
         },
         change(item) {
             // 输入框值发生改变事件
@@ -385,7 +424,7 @@ export default {
             // 处理权限状态
             if(item.length) {
                 for(var i of item) {
-                    if(i.rolePermission == 'Y') {
+                    if(i.rolePermission == 'Y' && i.children.length == 0) {
                         this.nowPermissionList.push(i.id)
                     }
                     if(i.children.length == 0) {
@@ -405,7 +444,7 @@ export default {
         submitpermission(item) {
             // 确定权限的变动
             for(let i of item) {
-                if(i.rolePermission == "Y") {
+                if(i.rolePermission == "Y" && i.children.length == 0) {
                     this.newPermissionObj[i.id] = true
                 } else {
                     this.newPermissionObj[i.id] = false
@@ -416,18 +455,23 @@ export default {
             }
         },
         checkChange(value) {
-            if(value.rolePermission == null) {
-                this.changePermission(value, 'Y')
-                // 改变状态
-            } else if(value.rolePermission == 'Y') {
-                this.changePermission(value, null)
-            }
+            // ????
+            this.nowPermissionList = []
+            // if(value.rolePermission == null) {
+            //     this.changePermission(value, "Y")
+            //     // 判断状态
+            // } else if(value.rolePermission == 'Y') {
+            //     this.changePermission(value, null)
+            // }
         },
         changePermission(item, data) {
-            item.rolePermission = data
-            if(item.children && item.children.length) {
+            // 改变权限状态
+            if(item.children.length == 0) {
+                item.rolePermission = data
+            }
+            if (item.children) {
                 for(var i of item.children) {
-                    this.changePermission(i, data)
+                    this.changePermission(i, data = i.rolePermission == "Y" ? null : "Y")
                 }
             }
         },
@@ -465,6 +509,38 @@ export default {
         },
         download() {
             // 下载
+            this.$emit('downloadModelFile')
+        },
+        print() {
+            // 打印
+            this.$notify({
+                title: 'Sorry',
+                message: '服务君正在完善该功能, 敬请期待!!!',
+                type: 'info'
+            });
+        },
+        addImg(e){
+            // 添加图片
+            console.log('e:', e)
+            let file = e.target.files[0];           
+            let param = new FormData(); //创建form对象
+            param.append('file',file,file.name);//通过append向form对象添加数据
+            param.append('sysUnitsId','0');//添加form表单中其他数据
+            console.log('--->',param.get('file')); //FormData私有类对象，访问不到，可以通过get判断值是否传进去
+            let config = {
+                headers:{'Content-Type':'application/json'}
+            };  //添加请求头
+            this.$emit('uploadPicture', param, config)
+        },
+        upImg(e) {
+            let file = e.target.files[0];
+            let param = new FormData();
+            param.append('file', file,file.name);
+            param.append('sysUnitsId',String(this.data.selectionArr[0].id));
+            let config = {
+                headers:{'Content-Type':'application/json'}
+            };
+            this.$emit('uploadPicture', param, config)
         }
     },
 }
@@ -493,5 +569,9 @@ export default {
 }
 .upButton{
     float: left;
+}
+.nowImg{
+    width: 28px;
+    height: 28px;
 }
 </style>

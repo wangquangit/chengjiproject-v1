@@ -69,9 +69,11 @@
 
             <el-scrollbar style="height:100%">
             <!-- <el-main class="main"> -->
-                <keep-alive>
-                    <router-view></router-view>
-                </keep-alive>
+                <div class="main">
+                    <keep-alive>
+                        <router-view></router-view>
+                    </keep-alive>
+                </div>
             </el-scrollbar>
             <!-- </el-main> -->
 
@@ -174,7 +176,7 @@ export default{
     padding: 1rem;
 }
 .main{
-    padding-top: 0;
+    margin: 2rem;
 }
 .tagsRigth{
     float: right;
